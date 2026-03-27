@@ -1,0 +1,91 @@
+---
+import ContentLayout from '../layouts/ContentLayout.astro';
+
+const faqs = [
+  {
+    q: "点击视频链接怎么跳转不了或者报错了？",
+    a: "一些视频可能由于B站下架、UP主隐藏等原因无法访问。表格和小站很难通过人工的方式手动排查失效的链接，而且部分索引包含原视频链接可以访问，所以会保留在小站当中。你可以通过小站有没有获取视频封面来简单判断（但此方法不保证准确）。如果在B站无法浏览，可以通过YouTube访问原作者视频。"
+  },
+  {
+    q: "小站数据时效性如何？",
+    a: "小站会尽可能保持一周一次检查是否更新并同步表格数据。如果在您访问期间数据不是最新数据，可以通过「导入表格」按钮更新。详情查看“如何导入表格数据？”。"
+  },
+  {
+    q: "如何导入表格数据？",
+    a: "您可以点击首页右上角的「导入表格」按钮，通过浏览器本地读取由B站UP主 敔信 制作的最新表格。如果不清楚格式要求，可以直接点击导入按钮查看弹窗内的详细说明。「导入表格」功能基于本地浏览器读取和渲染，并不涉及任何网络传输。"
+  },
+  {
+    q: "我该如何搜索想看的有声漫画？",
+    a: "您可以参考「快速探索」中列举的一些例子，通过关键词搜索可能能让您更快地找到您想看的类型。搜索也支持通过译名、原名、原作者的关键词搜索，但为了防止与视频标题撞名，小站暂时限制了通过汉化UP主名称关键词搜索。目前正在打算制作一个汉化UP主列表来解决这个问题。"
+  },
+  {
+    q: "为什么有些视频没有显示封面？",
+    a: "本站使用了修改后的 CSV 表格，添加了【封面】列并填写了本地路径。如果一些视频已经失效导致未填写该列，或者本地找不到对应的图片，系统会自动降级，会自动显示带有上传 UP 主首字母的彩色渐变方块，保证页面完整。"
+  }
+];
+---
+
+<ContentLayout title="常见问题与解答">
+  
+  <h1 class="text-3xl sm:text-4xl font-black text-wata-dark mb-3 text-center title-font">常见问题与解答</h1>
+  <p class="text-gray-500 text-center font-bold mb-10 text-sm sm:text-base">
+    如果您在使用 <span class="text-wata-pink font-black">biliVManga</span> 时遇到疑惑，请先查看以下解答
+  </p>
+
+  <!-- FAQ 列表 -->
+  <div class="space-y-4 max-w-3xl mx-auto">
+    {faqs.map((faq) => (
+      <details class="group bg-white border-2 border-wata-lightPink rounded-2xl overflow-hidden hover:border-wata-pink transition-colors duration-300">
+        
+        {/* 问题部分 */}
+        <summary class="cursor-pointer list-none select-none outline-none [&::-webkit-details-marker]:hidden block">
+          <div class="flex justify-between items-center p-5 font-black text-wata-dark text-[15px] sm:text-lg">
+            <span class="flex items-start sm:items-center gap-3">
+              <span class="text-wata-purple font-black text-xl leading-none">Q.</span>
+              <span class="leading-snug pt-0.5 sm:pt-0">{faq.q}</span>
+            </span>
+            
+            <span class="shrink-0 transition-transform duration-300 group-open:-rotate-45 text-wata-pink ml-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </span>
+          </div>
+        </summary>
+        
+        <div class="p-5 pt-0 bg-wata-bg/40 border-t-2 border-wata-lightPink text-gray-600 font-bold leading-relaxed text-sm sm:text-base faq-answer-animation">
+          <div class="flex items-start gap-3 mt-4">
+            <span class="text-wata-pink font-black text-xl leading-none">A.</span>
+            <p class="m-0 leading-relaxed font-normal pt-0.5">{faq.a}</p>
+          </div>
+        </div>
+      </details>
+    ))}
+  </div>
+
+  <div class="mt-16 pt-8 border-t-2 border-dashed border-wata-lightPink text-center">
+    <p class="text-gray-500 font-bold text-sm sm:text-base">
+      没有找到您想要的答案？ <br class="sm:hidden" />
+      欢迎在 GitHub 提交 <a href="https://github.com/MqyGalaxy/biliVManga/issues" target="_blank" class="text-wata-purple hover:text-wata-pink transition-colors underline underline-offset-4 decoration-wata-lightPink hover:decoration-wata-pink">Issue</a> 或通过邮件联系我们： <a href="mailto:mail@moeqy.com" class="text-wata-purple hover:text-wata-pink transition-colors underline underline-offset-4 decoration-wata-lightPink hover:decoration-wata-pink">mail[at]moeqy.com</a>
+    </p>
+  </div>
+
+</ContentLayout>
+
+<style>
+  /* 为展开的回答内容添加向下淡入动画 */
+  .faq-answer-animation {
+    animation: fadeInDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

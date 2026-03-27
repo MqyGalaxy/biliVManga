@@ -1,0 +1,35 @@
+---
+import Layout from './Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Footer from '../components/Footer.astro';
+
+// 接收页面传过来的标题
+const { title } = Astro.props;
+---
+
+<!-- 继承最基础的 HTML 骨架 -->
+<Layout title={`${title} | biliVManga - 有声漫画汉化索引`}>
+  
+  <!-- 1. 顶部插入精简版导航栏 -->
+  <PageHeader />
+
+  <!-- 页面背景氛围装饰 -->
+  <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
+    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-wata-pink/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-wata-purple/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- 2. 中间的内容区域 (类似一张白纸卡片) -->
+  <main class="max-w-[900px] mx-auto px-4 sm:px-6 py-12 sm:py-20 min-h-[70vh] fade-in">
+    <div class="bg-white rounded-3xl p-6 sm:p-12 shadow-wata border-4 border-wata-lightPink relative overflow-hidden">
+      <!-- 卡片顶部的彩色装饰条 -->
+      <div class="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-wata-pink via-wata-purple to-wata-cyan"></div>
+      
+      <!-- 这里是插槽，具体页面的文字内容会被塞到这里 -->
+      <article class="prose prose-sm sm:prose-base prose-headings:font-black prose-headings:text-wata-dark prose-a:text-wata-pink hover:prose-a:text-wata-purple prose-p:text-gray-600 prose-p:font-bold prose-p:leading-relaxed max-w-none pt-4">
+        <slot />
+      </article>
+    </div>
+  </main>
+
+</Layout>

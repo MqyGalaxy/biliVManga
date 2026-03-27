@@ -1,0 +1,50 @@
+---
+import ContentLayout from '../layouts/ContentLayout.astro';
+---
+
+<!-- 把内容塞进布局里，并把网页标题传进去 -->
+<ContentLayout title="关于本站">
+  
+  <!-- 这里面你可以随便写 HTML 或者 Markdown，样式会自动变得很漂亮 -->
+  <h1 class="text-3xl sm:text-4xl font-black text-wata-dark mb-8 text-center title-font">关于 biliVManga</h1>
+  
+  <p class="mt-3 mb-3">
+    欢迎来到 <span class="text-wata-pink font-black text-lg">biliVManga</span>！这是一个专为中文有声漫画（マンガ動画）爱好者打造的非盈利性汉化索引与导航网站。
+  </p>
+
+  <h2 class="text-xl font-black text-wata-purple mt-10 mb-4 border-b-2 border-wata-lightPink pb-2">🌟 我们的初衷</h2>
+  <p class="mt-3 mb-3">
+    有声漫画（マンガ動画）主要由显示漫画静态图像和播放背景对话音频组成的视频内容。其中许多有趣且感动的创作内容，是许多人愿意从盲目的现实生活中短暂停留的原因。
+  </p>
+  <p class="mt-3 mb-3">
+    但有声漫画的创作者目前并没有成形的多语言账号运营。于是在广阔的互联网中，有许多优秀的 UP 主和译者默默地为喜爱有声漫画的人们翻译着有声漫画。然而，这些优秀的作品往往散落在不同的角落，难以被系统地发现和回顾。
+  </p>
+  <p class="mt-3 mb-3">
+    本站的建立就是为了打破这种信息壁垒。我们希望通过极其干净、极速、无广告的界面，为大家提供一个方便检索、随时回味的“有声漫画图书馆”。
+  </p>
+
+  <h2 class="text-xl font-black text-wata-purple mt-10 mb-4 border-b-2 border-wata-lightPink pb-2">⚖️ 免责与版权声明</h2>
+  <ul class="list-disc pl-5 space-y-2 text-gray-600">
+    <li>
+      本站所有数据（包括视频标题、作者、封面及跳转链接）均由UP主 <strong>敔信</strong> 收集并授权。在使用时<strong>请遵守原数据表格的注意事项</strong>：
+      <ul class="list-decimal pl-5 space-y-1 pt-1">
+        <li>本站的数据为敔信个人，使用人工为主、采集器为辅的方式收集制作。数据参照各视频及下方简介提供的信息，如有侵权信息，请联系删除；</li>
+        <li>本站的数据免费提供，请保留收集者信息，仅供小范围学习交流使用；</li>
+        <li>允许有声漫画译者在其与有声漫画相关的内容中使用；</li>
+        <li>请勿用于其他未许可用途（原表格内已列出的UP主使用除外）;</li>
+        <li>请勿用于商业用途；</li>
+        <li>请勿篡改数据信息;</li>
+        <li>需要充电的视频，请谨慎消费，本站不构成消费建议，不承担相关责任；</li>
+        <li>对本站数据的最终解释权归敔信所有。如有能力，请支持有声漫画原作者，请支持有声漫画翻译者。</li>
+      </ul>
+    </li>
+    <li>本站<strong>不提供任何视频上传、存储或播放服务</strong>。所有播放行为均需跳转至原平台（如 bilibili、YouTube）进行。</li>
+    <li>本站完全开源免费，没有任何形式的商业盈利目的。</li>
+    <li>如果本站的索引内容侵犯了您的合法权益，请通过“联系小站"页面联系我们，我们将第一时间核实并移除相关链接。</li>
+  </ul>
+
+  <div class="mt-12 p-6 bg-wata-bg rounded-2xl border-2 border-dashed border-wata-purple text-center">
+    <p class="text-wata-purple font-black m-0">小站由所有 ❤ 有声漫画的人共同制作</p>
+  </div>
+								
+</ContentLayout>

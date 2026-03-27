@@ -1,0 +1,119 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --color-wata-pink: #ff6b9e;
+  --color-wata-fff: #fff;
+  --color-wata-lightPink: #ffe4f0;
+  --color-wata-purple: #b588f7;
+  --color-wata-cyan: #4de1c1;
+  --color-wata-yellow: #ffdc5e;
+  --color-wata-dark: #2d3436;
+  --color-wata-bg: #fbf7fb;
+
+  --shadow-wata: 0 8px 25px -5px rgba(255, 107, 158, 0.2);
+  --shadow-wata-hover: 0 12px 30px -5px rgba(181, 136, 247, 0.4);
+}
+
+@font-face {
+    font-family: 'Nunito';
+    src: url('/fonts/Nunito-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap; /* 让文字加载时避免闪烁空白 */
+  }
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/Nunito-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+    /* 这是您以后在 CSS 中调用它的名字 */
+    font-family: 'HarmonyOS Sans SC';
+    
+    /* 1. 针对 IE9 兼容 */
+    src: url('/fonts/HarmonyOS_Sans_SC.eot');
+    
+    /* 2. 针对各类现代与老旧浏览器（注意这里的顺序极其重要！） */
+    src: local('HarmonyOS Sans SC'), /* 优先查找用户电脑本地是否已经安装了该字体，省去下载 */
+         url('/fonts/HarmonyOS_Sans_SC.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('/fonts/HarmonyOS_Sans_SC.woff2') format('woff2'),                  /* 现代浏览器（体积最小，加载最快！） */
+         url('/fonts/HarmonyOS_Sans_SC.woff') format('woff'),                    /* 较老的现代浏览器 */
+         url('/fonts/HarmonyOS_Sans_SC.ttf') format('truetype'),                 /* 老版本 Safari, Android, iOS */
+         url('/fonts/HarmonyOS_Sans_SC.svg#HarmonyOS_Sans_SC') format('svg');    /* 极老版本的 iOS */
+         
+    font-weight: normal; 
+    font-style: normal;
+    font-display: swap; /* 确保字体下载期间，文字不会变成透明看不见 */
+  }
+
+  /* 之后您就可以像这样在全站使用了 */
+  body {
+    font-family: 'HarmonyOS Sans SC', sans-serif;
+  }
+
+/* 基础样式层：注入波点背景和可爱的滚动条 */
+@layer base {
+  body {
+    background-color: #fbf7fb;
+    /* 浅紫色波点背景 */
+    background-image: radial-gradient(#e6d5f7 2px, transparent 2px);
+    background-size: 30px 30px;
+    color: #2d3436;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* 滚动条美化 */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fbf7fb;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #ff6b9e, #b588f7);
+    border-radius: 10px;
+  }
+}
+
+/* 工具类层：注入渐变文字、悬浮和弹窗动画 */
+@layer utilities {
+  .title-font {
+    font-family: 'Nunito', 'HarmonyOS Sans SC', sans-serif;
+    font-weight: 900;
+  }
+  .text-gradient {
+    background: linear-gradient(135deg, #ff6b9e, #b588f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .modal-enter {
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes modalPop {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .video-cover {
+    transition: transform 0.3s ease;
+  }
+  .video-card:hover .video-cover {
+    transform: scale(1.05);
+  }
+}

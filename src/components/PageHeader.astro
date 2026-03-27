@@ -1,0 +1,114 @@
+---
+// 获取当前页面的路径，用于高亮显示当前所在的导航菜单
+const currentPath = Astro.url.pathname;
+import Logo from './svgs/Logo.jsx';
+
+// 导航菜单配置
+const navItems = [
+  { name: '返回首页', path: '/' },
+  { name: '关于本站', path: '/about/' },
+  { name: '常见问题', path: '/faq/' },
+  { name: '联系小站', path: '/connect/' }
+];
+---
+
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-2 border-wata-lightPink shadow-sm transition-all duration-300">
+  <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <!-- 顶部常驻栏 -->
+    <div class="flex items-center justify-between">
+      
+      <!-- 左侧 Logo (点击返回首页) -->
+      <a href="/" class="flex items-center gap-0 group hover:opacity-80 transition-opacity">
+        <img src="/public/favicon.svg" alt="biliVManga" class="w-8 h-8 sm:w-10 sm:h-10" />
+        <div class="sm:h-8 w-auto ml-0">
+            <Logo />
+        </div>
+      </a>
+
+      <!-- 右侧 桌面端导航链接 (大于 md 屏幕时显示) -->
+      <nav class="hidden md:flex items-center gap-6 lg:gap-8">
+        {navItems.map(item => {
+          const isActive = currentPath === item.path || currentPath === item.path + '/';
+          return (
+            <a 
+              href={item.path} 
+              class={`text-sm sm:text-base font-black transition-all duration-300 ${
+                isActive 
+                  ? 'text-wata-pink border-b-4 border-wata-pink rounded-sm pb-1' 
+                  : 'text-gray-400 hover:text-wata-purple hover:translate-y-[-2px] inline-block'
+              }`}
+            >
+              {item.name}
+            </a>
+          );
+        })}
+      </nav>
+
+      <!-- 右侧 移动端菜单按钮 -->
+      <button id="mobile-menu-btn" class="md:hidden p-2 text-wata-purple hover:text-wata-pink transition-colors focus:outline-none bg-wata-lightPink/30 rounded-xl">
+        {/* 汉堡图标 (默认显示) */}
+        <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="block transition-transform">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        {/* 叉号图标 (默认隐藏) */}
+        <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="hidden transition-transform">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- 移动端下拉菜单 (默认隐藏，点击按钮后展开) -->
+    <nav id="mobile-menu" class="hidden md:hidden flex-col gap-2 mt-4 pb-2 border-t-2 border-dashed border-wata-lightPink pt-4">
+      {navItems.map(item => {
+        const isActive = currentPath === item.path || currentPath === item.path + '/';
+        return (
+          <a 
+            href={item.path} 
+            class={`block px-4 py-3 rounded-xl font-black text-sm transition-colors ${
+              isActive 
+                ? 'bg-wata-lightPink text-wata-pink' 
+                : 'text-gray-500 hover:bg-gray-50 hover:text-wata-purple'
+            }`}
+          >
+            {item.name}
+          </a>
+        );
+      })}
+    </nav>
+  </div>
+</header>
+
+<script>
+  function setupMobileMenu() {
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    const iconMenu = document.getElementById('icon-menu');
+    const iconClose = document.getElementById('icon-close');
+
+    if (btn && menu) {
+      // 避免由于 Astro 视图过渡 (View Transitions) 导致的重复绑定
+      btn.replaceWith(btn.cloneNode(true));
+      const newBtn = document.getElementById('mobile-menu-btn');
+      
+      newBtn.addEventListener('click', () => {
+        // 切换菜单的可见状态
+        menu.classList.toggle('hidden');
+        menu.classList.toggle('flex');
+        
+        iconMenu.classList.toggle('hidden');
+        iconMenu.classList.toggle('block');
+        iconClose.classList.toggle('hidden');
+        iconClose.classList.toggle('block');
+      });
+    }
+  }
+
+  // 页面加载时执行
+  setupMobileMenu();
+  // 兼容 Astro 的 View Transitions 特性
+  document.addEventListener('astro:page-load', setupMobileMenu);
+</script>

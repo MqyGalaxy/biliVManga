@@ -1,0 +1,56 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Papa from 'papaparse';
+import ComicGallery from '../components/ComicGallery.jsx';
+import Layout from '../layouts/Layout.astro';
+
+// 在服务器端/构建时读取本地 CSV 文件
+// 请确保你在项目中创建了 src/data/ 文件夹，并放入了默认的 comics.csv
+const csvFilePath = path.resolve('./src/data/comics_with_cover.csv');
+let initialData = [];
+let initialHeaders = [];
+
+try {
+    if (fs.existsSync(csvFilePath)) {
+        const csvFile = fs.readFileSync(csvFilePath, 'utf-8');
+        const parsed = Papa.parse(csvFile, { skipEmptyLines: true });
+        const rawRows = parsed.data;
+
+        let headerIndex = -1;
+        // 寻找包含特定文字的行作为表头
+        for (let i = 0; i < Math.min(20, rawRows.length); i++) {
+            if (rawRows[i] && (rawRows[i].includes('原视频标题') || rawRows[i].includes('标题') || rawRows[i].includes('译名'))) {
+                headerIndex = i;
+                break;
+            }
+        }
+
+        if (headerIndex !== -1) {
+            initialHeaders = rawRows[headerIndex].map(h => h ? h.trim() : '').filter(h => h !== '');
+            for (let i = headerIndex + 1; i < rawRows.length; i++) {
+                const row = rawRows[i];
+                // 如果整行都是空的，就跳过
+                if (row.every(cell => !cell || cell.trim() === '')) continue;
+                let obj = {};
+                rawRows[headerIndex].forEach((header, index) => {
+                    const h = header ? header.trim() : '';
+                    if (h !== '') {
+                        obj[h] = row[index] ? row[index].trim() : '';
+                    }
+                });
+                initialData.push(obj);
+            }
+        }
+    }
+} catch (error) {
+    console.error("读取本地CSV失败，可能是文件不存在或路径错误：", error);
+}
+---
+
+<Layout title="biliVManga - 有声漫画汉化索引">
+    
+    <!-- client:load 确保 React 组件在浏览器加载后立即激活，拥有动态交互能力 -->
+    <ComicGallery client:load initialData={initialData} initialHeaders={initialHeaders} />
+
+</Layout>
