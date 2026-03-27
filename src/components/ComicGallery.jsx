@@ -37,7 +37,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
     
     const [inputPage, setInputPage] = useState("1");
     
-    const itemsPerPage = 16;
+    const itemsPerPage = 12;
     const customTags = ["青梅竹马", "前女友", "后辈", "上司", "学生会长", "学姐", "偶像" , "千金", "大小姐", "连载"];
 
     useEffect(() => {

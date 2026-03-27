@@ -23,7 +23,7 @@ export default function Logo({ className = "h-full w-auto" }) {
       <style>{`
         .custom-title-font {
           font-family: 'Nunito', sans-serif;
-          font-weight: 700; 
+          font-weight: 900; 
           font-style: normal;
         }
       `}</style>
@@ -62,9 +62,9 @@ export default function Logo({ className = "h-full w-auto" }) {
             biliVManga
           </text>
 
-          <use href="#sparkle" fill="#FF85A8" transform="translate(210, 15) scale(0.8)" />
+          <use href="#sparkle" fill="#FF85A8" transform="translate(215, 15) scale(0.8)" />
           
-          <use href="#sparkle" fill="#A87BF4" transform="translate(18, 45) scale(0.6)" />
+          <use href="#sparkle" fill="#A87BF4" transform="translate(16, 44) scale(0.6)" />
       </g>
     </svg>
   );
