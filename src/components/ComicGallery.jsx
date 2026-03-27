@@ -179,7 +179,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     
                     <a href="/" class="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity">
                         <div className="flex items-center justify-left gap-0 cursor-pointer">
-                            <img src="/public/favicon.svg" alt="biliVManga" class="w-8 h-8 sm:w-10 sm:h-10" />
+                            <img src="/favicon.svg" alt="biliVManga" class="w-8 h-8 sm:w-10 sm:h-10" />
                             <div class="h-6 sm:h-8 w-auto ml-0">
                                 <Logo />
                             </div>
