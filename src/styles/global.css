@@ -34,16 +34,14 @@
 }
 
 @font-face {
-    /* 这是您以后在 CSS 中调用它的名字 */
     font-family: 'HarmonyOS Sans SC';
     
-    /* 1. 针对 IE9 兼容 */
+    /* 针对 IE9 兼容 */
     src: url('/fonts/HarmonyOS_Sans_SC.eot');
     
-    /* 2. 针对各类现代与老旧浏览器（注意这里的顺序极其重要！） */
-    src: local('HarmonyOS Sans SC'), /* 优先查找用户电脑本地是否已经安装了该字体，省去下载 */
+    src: local('HarmonyOS Sans SC'), /* 本地 */
          url('/fonts/HarmonyOS_Sans_SC.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-         url('/fonts/HarmonyOS_Sans_SC.woff2') format('woff2'),                  /* 现代浏览器（体积最小，加载最快！） */
+         url('/fonts/HarmonyOS_Sans_SC.woff2') format('woff2'),                  /* 现代浏览器 */
          url('/fonts/HarmonyOS_Sans_SC.woff') format('woff'),                    /* 较老的现代浏览器 */
          url('/fonts/HarmonyOS_Sans_SC.ttf') format('truetype'),                 /* 老版本 Safari, Android, iOS */
          url('/fonts/HarmonyOS_Sans_SC.svg#HarmonyOS_Sans_SC') format('svg');    /* 极老版本的 iOS */
@@ -53,7 +51,6 @@
     font-display: swap; /* 确保字体下载期间，文字不会变成透明看不见 */
   }
 
-  /* 之后您就可以像这样在全站使用了 */
   body {
     font-family: 'HarmonyOS Sans SC', sans-serif;
   }
@@ -84,7 +81,7 @@
   }
 }
 
-/* 工具类层：注入渐变文字、悬浮和弹窗动画 */
+/* 注入渐变文字、悬浮和弹窗动画 */
 @layer utilities {
   .title-font {
     font-family: 'Nunito', 'HarmonyOS Sans SC', sans-serif;
