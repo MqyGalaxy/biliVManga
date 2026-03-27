@@ -11,7 +11,7 @@ const UpIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="
 const DateIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>;
 const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
 const BiliIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 512 512" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path fill="currentColor" d="M488.6 104.1c16.7 18.1 24.4 39.7 23.3 65.7l0 202.4c-.4 26.4-9.2 48.1-26.5 65.1-17.2 17-39.1 25.9-65.5 26.7L92 464c-26.4-.8-48.2-9.8-65.3-27.2-17.1-17.4-26-40.3-26.7-68.6L0 169.8c.8-26 9.7-47.6 26.7-65.7 17.1-16.3 38.8-25.3 65.3-26.1l29.4 0-25.4-25.8c-5.7-5.7-8.6-13-8.6-21.8s2.9-16.1 8.6-21.8 13-8.6 21.9-8.6 16.1 2.9 21.9 8.6l73.3 69.4 88 0 74.5-69.4C381.7 2.9 389.2 0 398 0s16.1 2.9 21.9 8.6c5.7 5.7 8.6 13 8.6 21.8s-2.9 16.1-8.6 21.8L394.6 78 423.9 78c26.4 .8 48 9.8 64.7 26.1zm-38.8 69.7c-.4-9.6-3.7-17.4-10.7-23.5-5.2-6.1-14-9.4-22.7-9.8l-320.4 0c-9.6 .4-17.4 3.7-23.6 9.8-6.1 6.1-9.4 13.9-9.8 23.5l0 194.4c0 9.2 3.3 17 9.8 23.5s14.4 9.8 23.6 9.8l320.4 0c9.2 0 17-3.3 23.3-9.8s9.7-14.3 10.1-23.5l0-194.4zM185.5 216.5c6.3 6.3 9.7 14.1 10.1 23.2l0 33.3c-.4 9.2-3.7 16.9-9.8 23.2-6.2 6.3-14 9.5-23.6 9.5s-17.5-3.2-23.6-9.5-9.4-14-9.8-23.2l0-33.3c.4-9.1 3.8-16.9 10.1-23.2s13.2-9.6 23.3-10c9.2 .4 17 3.7 23.3 10zm191.5 0c6.3 6.3 9.7 14.1 10.1 23.2l0 33.3c-.4 9.2-3.7 16.9-9.8 23.2s-14 9.5-23.6 9.5-17.4-3.2-23.6-9.5c-7-6.3-9.4-14-9.7-23.2l0-33.3c.3-9.1 3.7-16.9 10-23.2s14.1-9.6 23.3-10c9.2 .4 17 3.7 23.3 10z"/><polyline points="17 2 12 7 7 2"/></svg>;
-const JumpLinkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">/** Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc. */<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>;
+const JumpLinkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>;
 const FileUploadBigIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 12v6"/><path d="m15 15-3-3-3 3"/></svg>;
 
 // 用于随机打乱数组顺序
@@ -39,7 +39,6 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
     const itemsPerPage = 16;
     const customTags = ["青梅竹马", "前女友", "后辈", "上司", "学生会长", "学姐", "偶像" , "千金", "大小姐", "连载"];
 
-    // 组件挂载后，在客户端打乱初始数据的顺序 (防止 Astro 服务端渲染时的水合报错)
     useEffect(() => {
         if (initialData.length > 0) {
             setData(shuffleArray(initialData));
@@ -50,11 +49,15 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
     const getValue = (item, possibleKeys) => {
         if (!item) return '';
         const keys = Object.keys(item);
+        
+        // 1. 精确匹配
         for (let pk of possibleKeys) {
             const cleanPk = cleanStr(pk);
             const match = keys.find(k => cleanStr(k) === cleanPk);
             if (match && item[match] && typeof item[match] === 'string' && item[match].trim() !== '') return item[match].trim();
         }
+        
+        // 2. 模糊匹配
         for (let pk of possibleKeys) {
             const cleanPk = cleanStr(pk);
             const match = keys.find(k => cleanStr(k).includes(cleanPk));
@@ -67,7 +70,6 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
         const file = event.target.files[0];
         if (!file) return;
         
-        // 选中文件后关闭弹窗并显示加载中
         setShowUploadModal(false);
         setLoading(true);
 
@@ -98,8 +100,6 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     items.push(obj);
                 }
                 setTableHeaders(headers.filter(h => h !== ''));
-                
-                // 手动导入表格后，将新数据打乱顺序再保存
                 setData(shuffleArray(items));
                 setLoading(false);
                 setPage(1);
@@ -147,7 +147,6 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
         setInputPage(page.toString());
     }, [page]);
 
-    // 禁用底部滚动：如果打开了详情弹窗，或者打开了上传弹窗
     useEffect(() => {
         document.body.style.overflow = (selectedItem || showUploadModal) ? 'hidden' : 'auto';
     }, [selectedItem, showUploadModal]);
@@ -161,7 +160,6 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     return (
         <div className="min-h-screen pb-20">
-            {/* 动态淡入动画 CSS */}
             <style>{`
                 @keyframes cardFadeInUp {
                     from { opacity: 0; transform: translateY(15px); }
@@ -173,14 +171,13 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                 }
             `}</style>
 
-            {/* 响应式导航栏 */}
             <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-2 border-wata-lightPink shadow-sm">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
                     
-                    <a href="/" class="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity">
+                    <a href="/" className="flex items-center gap-2 sm:gap-3 group hover:opacity-80 transition-opacity">
                         <div className="flex items-center justify-left gap-0 cursor-pointer">
-                            <img src="/favicon.svg" alt="biliVManga" class="w-8 h-8 sm:w-10 sm:h-10" />
-                            <div class="h-6 sm:h-8 w-auto ml-0">
+                            <img src="/favicon.svg" alt="biliVManga" className="w-8 h-8 sm:w-10 sm:h-10" />
+                            <div className="h-6 sm:h-8 w-auto ml-0">
                                 <Logo />
                             </div>
                             <span className="hidden sm:inline-block text-[10px] font-bold text-wata-fff bg-wata-purple px-2 py-0.5 rounded-full ml-3">有声漫画汉化索引</span>
@@ -264,7 +261,6 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         const displayTitle = (translatedName && translatedName !== '') ? translatedName : originalTitle;
                         const author = getValue(item, ['原视频作者']) || '未知原作者';
                         
-                        // 正则剔除 UID 逻辑，支持各种括号且不误伤正常英文
                         const rawUploader = getValue(item, ['译者（UID）']) || '未知译者';
                         const uploader = rawUploader.replace(/(^|[^a-zA-Z])[(（\[{【\s]*uid[:：\s]*\d+[)）\]}】\s]*/gi, '$1').trim() || '未知译者';
                         
@@ -406,7 +402,6 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             </ul>
                         </div>
 
-                        {/* 点击上传区域 */}
                         <label className="border-2 border-dashed border-wata-lightPink hover:border-wata-pink bg-wata-bg/30 hover:bg-wata-lightPink/20 rounded-2xl p-8 sm:p-10 flex flex-col items-center justify-center cursor-pointer transition-colors group">
                             <div className="text-wata-purple group-hover:text-wata-pink group-hover:scale-110 transition-transform duration-300 mb-4">
                                 <FileUploadBigIcon />
@@ -464,12 +459,14 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                     {tableHeaders.map((key) => {
                                         const value = selectedItem[key];
                                         if (!value || typeof value !== 'string' || value.trim() === '') return null;
-                                        const lowerKey = key.toLowerCase();
                                         
-                                        if (['译名', '中文名', '译文标题', '封面'].some(k => lowerKey.includes(k))) return null;
+                                        if (key === '译者（UID）排名不分先后' || key === '进度'  || key === '授权' || key === '序号') return null;
+                                        
+                                        const lowerKey = key.toLowerCase();
+                                        if (['翻译视频标题(黑字熟肉红字生肉)', '封面'].some(k => lowerKey.includes(k))) return null;
                                         if (value.trim() === modalMainTitle) return null;
                                         if (lowerKey.includes('序号')) return null;
-                                        
+
                                         const isLink = value.startsWith('http');
                                         const isLongText = value.length > 40 || key.includes('简介') || key.includes('说明') || isLink;
                                         const isImportantKey = lowerKey.includes('作者') || lowerKey.includes('up主') || lowerKey.includes('标题');
