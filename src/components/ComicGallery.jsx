@@ -10,8 +10,8 @@ const AuthorIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" heig
 const UpIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/><path d="M12 10v9"/></svg>;
 const DateIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>;
 const CloseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
-// Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.
 const BiliIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 512 512" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path fill="currentColor" d="M488.6 104.1c16.7 18.1 24.4 39.7 23.3 65.7l0 202.4c-.4 26.4-9.2 48.1-26.5 65.1-17.2 17-39.1 25.9-65.5 26.7L92 464c-26.4-.8-48.2-9.8-65.3-27.2-17.1-17.4-26-40.3-26.7-68.6L0 169.8c.8-26 9.7-47.6 26.7-65.7 17.1-16.3 38.8-25.3 65.3-26.1l29.4 0-25.4-25.8c-5.7-5.7-8.6-13-8.6-21.8s2.9-16.1 8.6-21.8 13-8.6 21.9-8.6 16.1 2.9 21.9 8.6l73.3 69.4 88 0 74.5-69.4C381.7 2.9 389.2 0 398 0s16.1 2.9 21.9 8.6c5.7 5.7 8.6 13 8.6 21.8s-2.9 16.1-8.6 21.8L394.6 78 423.9 78c26.4 .8 48 9.8 64.7 26.1zm-38.8 69.7c-.4-9.6-3.7-17.4-10.7-23.5-5.2-6.1-14-9.4-22.7-9.8l-320.4 0c-9.6 .4-17.4 3.7-23.6 9.8-6.1 6.1-9.4 13.9-9.8 23.5l0 194.4c0 9.2 3.3 17 9.8 23.5s14.4 9.8 23.6 9.8l320.4 0c9.2 0 17-3.3 23.3-9.8s9.7-14.3 10.1-23.5l0-194.4zM185.5 216.5c6.3 6.3 9.7 14.1 10.1 23.2l0 33.3c-.4 9.2-3.7 16.9-9.8 23.2-6.2 6.3-14 9.5-23.6 9.5s-17.5-3.2-23.6-9.5-9.4-14-9.8-23.2l0-33.3c.4-9.1 3.8-16.9 10.1-23.2s13.2-9.6 23.3-10c9.2 .4 17 3.7 23.3 10zm191.5 0c6.3 6.3 9.7 14.1 10.1 23.2l0 33.3c-.4 9.2-3.7 16.9-9.8 23.2s-14 9.5-23.6 9.5-17.4-3.2-23.6-9.5c-7-6.3-9.4-14-9.7-23.2l0-33.3c.3-9.1 3.7-16.9 10-23.2s14.1-9.6 23.3-10c9.2 .4 17 3.7 23.3 10z"/><polyline points="17 2 12 7 7 2"/></svg>;
+// Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.
 const JumpLinkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>;
 const FileUploadBigIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 12v6"/><path d="m15 15-3-3-3 3"/></svg>;
 const HeartOutlineIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>;
@@ -232,6 +232,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                 const originalTitle = getValue(item, ['原视频标题', '视频标题']).toLowerCase();
                 const author = getValue(item, ['原作者', '原视频作者', '作者']).toLowerCase();
                 
+                // 尊重您的意愿，这里不再读取译者进行搜索，彻底防误伤！
                 return translatedName.includes(lowerSearch) || originalTitle.includes(lowerSearch) || author.includes(lowerSearch);
             });
         }
@@ -316,9 +317,10 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             共 {filteredData.length} 篇
                         </div>
 
+                        {/* 我的收藏按钮 */}
                         <button 
                             onClick={() => { setShowFavoritesOnly(!showFavoritesOnly); setViewMode('gallery'); setPage(1); }}
-                            className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-300 ${showFavoritesOnly ? 'bg-wata-pink text-white shadow-wata' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                            className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-300 cursor-pointer ${showFavoritesOnly ? 'bg-wata-pink text-white shadow-wata' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                             title={showFavoritesOnly ? "查看全部" : "查看我的收藏"}
                         >
                             {showFavoritesOnly ? <HeartFilledIcon className="text-white" /> : <HeartOutlineIcon />}
@@ -370,7 +372,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                     ← 返回作品库
                                 </button>
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-black title-font text-wata-dark">UP主集结地</h2>
+                            <h2 className="text-2xl sm:text-3xl font-black text-wata-dark">UP主集结地</h2>
                             <p className="text-sm font-bold text-gray-400 mt-2">感谢所有为有声漫画汉化付出心血的UP主们！点击头像可快速查看Ta的作品。</p>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
@@ -401,7 +403,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     </div>
                 ) : (
                     // 视图 1：传统的作品画廊视图
-                    <>
+                    <div className="fade-in-active">
                         {(data.length > 0 || selectedUploader) && (
                             <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center">
                                 <span className="text-xs sm:text-sm font-black text-wata-purple mr-1">快速探索:</span>
@@ -456,7 +458,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
                                 <HeartOutlineIcon className="w-16 h-16 mb-4 opacity-50" />
                                 <p className="font-bold text-lg">您还没有收藏任何作品喔</p>
-                                <p className="text-sm mt-2">点击卡片右上角的心形图标即可收藏</p>
+                                <p className="text-sm mt-2">点击心形图标即可收藏</p>
                             </div>
                         )}
 
@@ -480,7 +482,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
                                 return (
                                     <div 
-                                        key={`card-${page}-${searchTerm}-${index}`}
+                                        key={`card-${showFavoritesOnly}-${selectedUploader}-${page}-${searchTerm}-${index}`}
                                         className="video-card group cursor-pointer fade-in-active flex flex-col"
                                         style={{
                                             animationFillMode: 'both', 
@@ -505,7 +507,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                             {/* 卡片右上角的收藏按钮 */}
                                             <button 
                                                 onClick={(e) => toggleFavorite(e, item)}
-                                                className="absolute top-2 right-2 z-20 p-2 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
+                                                className="absolute top-2 right-2 z-20 p-2 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 cursor-pointer"
                                                 title={isFav ? "取消收藏" : "加入收藏"}
                                             >
                                                 {isFav ? <HeartFilledIcon className="text-wata-pink" /> : <HeartOutlineIcon />}
@@ -579,7 +581,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                 </button>
                             </div>
                         )}
-                    </>
+                    </div>
                 )}
             </main>
 
@@ -664,6 +666,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         <div className="modal-enter relative bg-white rounded-[24px] sm:rounded-3xl shadow-2xl w-full max-w-3xl max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden border-4 border-wata-lightPink">
                             <div className="h-2 sm:h-4 bg-gradient-to-r from-wata-pink via-wata-purple to-wata-cyan w-full shrink-0"></div>
                             
+                            {/* --- 恢复：顶部只保留关闭按钮 --- */}
                             <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100 flex justify-between items-start relative shrink-0">
                                 <div className="pr-10 w-full">
                                     <h2 className="text-lg sm:text-2xl font-black title-font text-wata-dark mb-1 whitespace-normal break-words leading-snug">
