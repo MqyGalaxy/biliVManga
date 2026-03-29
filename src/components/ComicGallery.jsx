@@ -209,10 +209,11 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
         // 第二层：只看收藏逻辑拦截
         if (showFavoritesOnly) {
-            validData = validData.filter(item => {
-                const key = getItemUniqueKey(item);
-                return favorites.includes(key);
-            });
+            const reversedFavs = [...favorites].reverse();
+            
+            validData = reversedFavs.map(favKey => {
+                return validData.find(item => getItemUniqueKey(item) === favKey);
+            }).filter(Boolean); // filter(Boolean) 是为了安全过滤掉原表格里可能已经被删除的失效收藏
         }
 
         // 第三层：独立处理点击进来的 UP主 过滤
@@ -465,7 +466,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         {showFavoritesOnly && currentData.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
                                 <HeartOutlineIcon className="w-16 h-16 mb-4 opacity-50" />
-                                <p className="font-bold text-lg">您还没有收藏任何作品喔</p>
+                                <p className="font-bold text-lg">小站没有找到收藏作品喔</p>
                                 <p className="text-sm mt-2">点击心形图标即可收藏</p>
                             </div>
                         )}
