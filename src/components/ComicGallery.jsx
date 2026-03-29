@@ -260,6 +260,14 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
         document.body.style.overflow = (selectedItem || showUploadModal || showAnnouncement) ? 'hidden' : 'auto';
     }, [selectedItem, showUploadModal, showAnnouncement]);
 
+    // 监听翻页或视图切换，自动平滑滚动到顶部
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }, [page, viewMode, showFavoritesOnly, selectedUploader, searchTerm]);
+
     const getAvatarGradient = (str) => {
         const colors = ['from-wata-pink to-wata-purple', 'from-wata-cyan to-blue-400', 'from-wata-yellow to-orange-400', 'from-purple-400 to-pink-400', 'from-green-400 to-wata-cyan'];
         let hash = 0;
