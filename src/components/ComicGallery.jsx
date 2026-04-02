@@ -732,12 +732,12 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
                                     {origLink && (
                                         <a href={origLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-6 py-2.5 bg-wata-purple text-white font-black rounded-full transition-all duration-300 shadow-wata hover:shadow-wata-hover hover:scale-105 cursor-pointer border-2 border-transparent">
-                                            <JumpLinkIcon /> 原视频链接
+                                            <JumpLinkIcon /> 原视频
                                         </a>
                                     )}
                                     {biliLink && (
                                         <a href={biliLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#fb7299] text-white font-black rounded-full transition-all duration-300 shadow-wata hover:shadow-wata-hover hover:scale-105 cursor-pointer border-2 border-transparent">
-                                            <BiliIcon /> 翻译视频链接
+                                            <BiliIcon /> 翻译视频
                                         </a>
                                     )}
                                     {(!biliLink && !origLink) && (
