@@ -12,7 +12,7 @@ if (!fs.existsSync(COVERS_DIR)) {
     fs.mkdirSync(COVERS_DIR, { recursive: true });
 }
 
-// 伪装浏览器请求头，防止 B 站 API 拦截
+// 伪装浏览器请求头防止 B 站 API 拦截
 const HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Referer': 'https://www.bilibili.com'
@@ -29,7 +29,7 @@ async function downloadCover(bvid) {
             return null;
         }
 
-        // 2. 拼接魔法后缀压缩为 WebP
+        // 2. 拼接后缀压缩为 WebP
         const picUrl = data.data.pic.replace('http://', 'https://') + '@400w_225h_1c.webp';
         
         // 3. 下载图片
@@ -118,7 +118,7 @@ async function main() {
                     if (match) {
                         const bvid = match[1];
                         
-                        // 【超强特性】：断点续传检查
+                        // 断点续传检查
                         const expectedLocalPath = path.join(COVERS_DIR, `${bvid}.webp`);
                         if (fs.existsSync(expectedLocalPath)) {
                             console.log(`⏩ [${bvid}] 本地已存在，自动跳过`);
