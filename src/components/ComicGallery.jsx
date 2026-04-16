@@ -17,6 +17,7 @@ const FileUploadBigIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="4
 const HeartOutlineIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>;
 const HeartFilledIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>;
 const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
+const SortIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>;
 
 // 用于随机打乱数组顺序
 const shuffleArray = (array) => {
@@ -50,6 +51,9 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
     // 视图模式状态 (gallery 或者是 uploaders)
     const [viewMode, setViewMode] = useState('gallery'); 
 
+    // 排序模式状态
+    const [sortMode, setSortMode] = useState('random'); // 'random', 'newest', 'oldest'
+
     const [inputPage, setInputPage] = useState("1");
     
     const itemsPerPage = 12;
@@ -57,7 +61,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (1)
     useEffect(() => {
-        const hasSeen = localStorage.getItem('announcement_2026v1');
+        const hasSeen = localStorage.getItem('announcement_2026v2');
         if (!hasSeen) {
             setShowAnnouncement(true);
         }
@@ -82,13 +86,15 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (2)
     const closeAnnouncement = () => {
-        localStorage.setItem('announcement_2026v1', 'true');
+        localStorage.setItem('announcement_2026v2', 'true');
         setShowAnnouncement(false);
     };
 
     useEffect(() => {
         if (initialData.length > 0) {
-            setData(shuffleArray(initialData));
+            // --- 核心：在打乱顺序前，记录它在表格中的原始物理行号 ---
+            const indexedData = initialData.map((item, i) => ({ ...item, _originalIndex: i }));
+            setData(shuffleArray(indexedData));
         }
     }, [initialData]);
 
@@ -156,7 +162,8 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                 for(let i = headerIndex + 1; i < rawRows.length; i++) {
                     const row = rawRows[i];
                     if(row.every(cell => !cell || cell.trim() === '')) continue;
-                    let obj = {};
+                    // --- 核心：在解析新表格时，同样记录物理行号 ---
+                    let obj = { _originalIndex: i };
                     headers.forEach((header, index) => {
                         if(header && header !== '') {
                             obj[header] = row[index] ? row[index].trim() : '';
@@ -165,9 +172,10 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     items.push(obj);
                 }
                 setTableHeaders(headers.filter(h => h !== ''));
-                setData(shuffleArray(items));
+                setData(shuffleArray(items)); // 初始依然打乱展示
                 setLoading(false);
                 setPage(1);
+                setSortMode('random'); // 导入新表重置排序状态
             },
             error: () => { alert("解析失败了！"); setLoading(false); }
         });
@@ -233,13 +241,23 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                 const originalTitle = getValue(item, ['原视频标题', '视频标题']).toLowerCase();
                 const author = getValue(item, ['原作者', '原视频作者', '作者']).toLowerCase();
                 
-                // 尊重您的意愿，这里不再读取译者进行搜索，彻底防误伤！
+                // 不读取译者进行搜索
                 return translatedName.includes(lowerSearch) || originalTitle.includes(lowerSearch) || author.includes(lowerSearch);
             });
         }
 
+        // --- 第五层：处理排序 (仅在不看收藏夹时生效) ---
+        if (!showFavoritesOnly) {
+            if (sortMode === 'newest') {
+                validData.sort((a, b) => b._originalIndex - a._originalIndex);
+            } else if (sortMode === 'oldest') {
+                validData.sort((a, b) => a._originalIndex - b._originalIndex);
+            }
+            // 如果是 random，就保留当前 data 中已经被 shuffleArray 打乱过的原始顺序
+        }
+
         return validData;
-    }, [data, searchTerm, showFavoritesOnly, favorites, selectedUploader]); 
+    }, [data, searchTerm, showFavoritesOnly, favorites, selectedUploader, sortMode]); 
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
     const currentData = filteredData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -267,7 +285,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
             top: 0,
             behavior: 'smooth'
         });
-    }, [page, viewMode, showFavoritesOnly, selectedUploader, searchTerm]);
+    }, [page, viewMode, showFavoritesOnly, selectedUploader, searchTerm, sortMode]);
 
     const getAvatarGradient = (str) => {
         const colors = ['from-wata-pink to-wata-purple', 'from-wata-cyan to-blue-400', 'from-wata-yellow to-orange-400', 'from-purple-400 to-pink-400', 'from-green-400 to-wata-cyan'];
@@ -381,7 +399,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                     ← 返回作品库
                                 </button>
                             </div>
-                            <h2 className="text-2xl sm:text-3xl font-black text-wata-dark">UP主集结地</h2>
+                            <h2 className="text-2xl sm:text-3xl font-black title-font text-wata-dark">UP主集结地</h2>
                             <p className="text-sm font-bold text-gray-400 mt-2">感谢所有为有声漫画汉化付出心血的UP主们！点击头像可快速查看Ta的作品。</p>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
@@ -411,16 +429,15 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         </div>
                     </div>
                 ) : (
-                    // 视图 1：传统的作品画廊视图
                     <div className="fade-in-active">
                         {(data.length > 0 || selectedUploader) && (
                             <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center">
-                                <span className="text-xs sm:text-sm font-black text-wata-purple mr-1">快速探索:</span>
+                                <span className="text-xs sm:text-sm font-black text-wata-purple mr-1 shrink-0">快速探索:</span>
                                 
-                                {/* UP 主列表按钮 */}
+                                {/* UP 主列表按钮  */}
                                 <button 
                                     onClick={() => { setViewMode('uploaders'); setPage(1); }}
-                                    className="flex items-center gap-1 px-3 py-1 bg-wata-purple text-white text-[11px] sm:text-xs font-bold rounded-full hover:shadow-wata hover:scale-105 transition-all cursor-pointer"
+                                    className="flex items-center gap-1 px-3 py-1 bg-wata-purple text-white text-[11px] sm:text-xs font-bold rounded-full hover:shadow-wata hover:scale-105 transition-all cursor-pointer shrink-0"
                                     title="查看UP主列表"
                                 >
                                     <UsersIcon /> UP主列表
@@ -430,30 +447,50 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                     <button 
                                         key={idx}
                                         onClick={() => {setSearchTerm(tag); setPage(1); setShowFavoritesOnly(false);}} // 点击标签时退出纯收藏模式
-                                        className="px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-dark text-[11px] sm:text-xs font-normal rounded-full hover:bg-wata-pink hover:text-white hover:border-wata-pink hover:shadow-wata transition-all cursor-pointer"
+                                        className="px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-dark text-[11px] sm:text-xs font-normal rounded-full hover:bg-wata-pink hover:text-white hover:border-wata-pink hover:shadow-wata transition-all cursor-pointer shrink-0"
                                     >
                                         #{tag}
                                     </button>
                                 ))}
                                 
-                                <div className="ml-auto flex gap-2">
+                                <div className="ml-auto flex flex-wrap justify-end gap-2">
+                                    {/* 排序切换按钮 (只在没有查看收藏夹时显示)  */}
+                                    {!showFavoritesOnly && (
+                                        <button 
+                                            onClick={() => {
+                                                if (sortMode === 'random') setSortMode('newest');
+                                                else if (sortMode === 'newest') setSortMode('oldest');
+                                                else setSortMode('random');
+                                                setPage(1);
+                                            }}
+                                            className="flex items-center gap-1 px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-purple text-[11px] sm:text-xs font-bold rounded-full hover:bg-wata-pink hover:text-white hover:border-wata-pink transition-all cursor-pointer shadow-sm shrink-0"
+                                            title="点击切换排序方式"
+                                        >
+                                            <SortIcon />
+                                            <span>
+                                                {sortMode === 'random' ? '打乱随机' : sortMode === 'newest' ? '表格倒序' : '表格正序'}
+                                            </span>
+                                        </button>
+                                    )}
+
                                     {/* 取消 UP 主过滤按钮 */}
                                     {selectedUploader && (
                                         <button 
                                             onClick={() => {setSelectedUploader(null); setPage(1);}}
-                                            className="flex items-center px-3 py-1 bg-wata-purple text-white text-[11px] sm:text-xs font-bold rounded-full hover:bg-opacity-80 transition-all cursor-pointer max-w-[150px] sm:max-w-none"
+                                            className="flex items-center px-3 py-1 bg-wata-pink text-white text-[11px] sm:text-xs font-bold rounded-full hover:bg-opacity-80 transition-all cursor-pointer shrink-0"
                                             title={`取消 UP主: ${selectedUploader}`}
                                         >
                                             <span className="shrink-0">取消 UP主: </span>
-                                            <span className="truncate max-w-[50px] sm:max-w-[150px] mx-1">{selectedUploader}</span>
+                                            <span className="truncate max-w-[60px] sm:max-w-[150px] mx-1">{selectedUploader}</span>
                                             <span className="shrink-0"> x</span>
                                         </button>
                                     )}
 
+                                    {/* 清除检索按钮 */}
                                     {searchTerm && (
                                         <button 
                                             onClick={() => {setSearchTerm(""); setPage(1);}}
-                                            className="px-3 py-1 bg-gray-100 text-gray-500 text-[11px] sm:text-xs font-bold rounded-full hover:bg-gray-200 transition-all cursor-pointer"
+                                            className="flex items-center px-3 py-1 bg-gray-100 text-gray-500 text-[11px] sm:text-xs font-bold rounded-full hover:bg-gray-200 transition-all cursor-pointer shrink-0"
                                         >
                                             清除检索 x
                                         </button>
@@ -491,7 +528,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
                                 return (
                                     <div 
-                                        key={`card-${showFavoritesOnly}-${selectedUploader}-${page}-${searchTerm}-${index}`}
+                                        key={`card-${showFavoritesOnly}-${selectedUploader}-${sortMode}-${page}-${searchTerm}-${index}`}
                                         className="video-card group cursor-pointer fade-in-active flex flex-col"
                                         style={{
                                             animationFillMode: 'both', 
@@ -675,7 +712,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         <div className="modal-enter relative bg-white rounded-[24px] sm:rounded-3xl shadow-2xl w-full max-w-3xl max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden border-4 border-wata-lightPink">
                             <div className="h-2 sm:h-4 bg-gradient-to-r from-wata-pink via-wata-purple to-wata-cyan w-full shrink-0"></div>
                             
-                            {/* --- 恢复：顶部只保留关闭按钮 --- */}
+                            {/* --- 顶部只保留关闭按钮 --- */}
                             <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-gray-100 flex justify-between items-start relative shrink-0">
                                 <div className="pr-10 w-full">
                                     <h2 className="text-lg sm:text-2xl font-black title-font text-wata-dark mb-1 whitespace-normal break-words leading-snug">
@@ -767,18 +804,14 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             <ul className="space-y-2 pl-2 max-h-full overflow-y-auto">
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>添加了视频收藏功能，通过点击视频封面右上角的 ♥ 形按钮，或者在视频详情页面中点击收藏按钮，即可在浏览器本地收藏视频（但更换浏览器、删除本地缓存数据后会被清除，敬请注意）；</span>
+                                    <span>添加了切换主页视频展示顺序的功能，通过点击“快速探索”中的排序按钮即可切换三种排序方式；</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>添加了汉化UP主列表，通过点击“快速探索”中的“UP主列表”即可预览；</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>优化了表格搜索，现在标题为空的视频不会被网页读取（默认标题为空的视频为被删除视频）。</span>
+                                    <span>主页默认“随机排序”，用户可选择切换为“表格倒序”（方便查看新收录作品）和“表格正序”（查看旧收录老作品）。</span>
                                 </li>
                             </ul>
-                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/03/29</p>
+                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/04/16</p>
                         </div>
                         <button onClick={closeAnnouncement} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-wata-pink to-wata-purple text-white font-black rounded-full hover:shadow-wata-hover hover:scale-105 transition-all duration-300 cursor-pointer">
                             我知道啦
