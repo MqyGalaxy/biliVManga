@@ -18,6 +18,8 @@ const HeartOutlineIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18
 const HeartFilledIcon = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>;
 const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
 const SortIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>;
+const CloudSyncIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m8 17 4 4 4-4"/></svg>;
+const CopyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
 
 // 用于随机打乱数组顺序
 const shuffleArray = (array) => {
@@ -43,6 +45,11 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
     
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [showAnnouncement, setShowAnnouncement] = useState(false);
+
+    // 收藏导入导出弹窗状态
+    const [showSyncModal, setShowSyncModal] = useState(false);
+    const [syncInputMode, setSyncInputMode] = useState(false); // false: 导出模式, true: 导入模式
+    const [syncInputValue, setSyncInputValue] = useState("");
     
     // 收藏功能的状态
     const [favorites, setFavorites] = useState([]);
@@ -57,11 +64,11 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
     const [inputPage, setInputPage] = useState("1");
     
     const itemsPerPage = 12;
-    const customTags = ["青梅竹马", "前女友", "后辈", "上司", "学生会长", "学姐", "偶像" , "千金", "大小姐", "连载"];
+    const customTags = ["青梅竹马", "前女友", "后辈", "上司", "社长", "学生会长", "偶像" , "千金", "大小姐", "连载"];
 
     // 修改公告版本号 (1)
     useEffect(() => {
-        const hasSeen = localStorage.getItem('announcement_2026v2');
+        const hasSeen = localStorage.getItem('announcement_2026v3');
         if (!hasSeen) {
             setShowAnnouncement(true);
         }
@@ -86,8 +93,17 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (2)
     const closeAnnouncement = () => {
-        localStorage.setItem('announcement_2026v2', 'true');
+        localStorage.setItem('announcement_2026v3', 'true');
         setShowAnnouncement(false);
+    };
+
+    // 全局轻提示状态 
+    const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
+
+    const showToast = (msg, type = 'success') => {
+        setToast({ show: true, msg, type });
+        // 3秒后自动消失
+        setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
     };
 
     useEffect(() => {
@@ -154,7 +170,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     }
                 }
                 if(headerIndex === -1) {
-                    alert("找不到表头啦，请确认表格里是否有【原视频标题】或【译名】列！");
+                    showToast("找不到表头啦，请确认表格里是否有【原视频标题】或【译名】列！", "error");
                     setLoading(false); return;
                 }
                 const headers = rawRows[headerIndex].map(h => h ? h.trim() : '');
@@ -177,7 +193,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                 setPage(1);
                 setSortMode('random'); // 导入新表重置排序状态
             },
-            error: () => { alert("解析失败了！"); setLoading(false); }
+            error: () => { showToast("解析失败了！", "error"); setLoading(false); }
         });
     };
 
@@ -277,7 +293,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     useEffect(() => {
         document.body.style.overflow = (selectedItem || showUploadModal || showAnnouncement) ? 'hidden' : 'auto';
-    }, [selectedItem, showUploadModal, showAnnouncement]);
+    }, [selectedItem, showUploadModal, showAnnouncement, showSyncModal]);
 
     // 监听翻页或视图切换，自动平滑滚动到顶部
     useEffect(() => {
@@ -292,6 +308,45 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
         let hash = 0;
         for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
         return colors[Math.abs(hash) % colors.length];
+    };
+
+    const handleSyncAction = () => {
+        if (!syncInputMode) {
+            try {
+                const jsonStr = JSON.stringify(favorites);
+                const b64Str = btoa(encodeURIComponent(jsonStr));
+                setSyncInputValue(b64Str);
+            } catch (e) {
+                showToast("生成同步码失败！", "error");
+            }
+        } else {
+            if (!syncInputValue.trim()) { showToast("请输入同步码！", "error"); return; }
+            try {
+                const jsonStr = decodeURIComponent(atob(syncInputValue.trim()));
+                const importedFavs = JSON.parse(jsonStr);
+                if (Array.isArray(importedFavs)) {
+                    const mergedFavs = Array.from(new Set([...favorites, ...importedFavs]));
+                    setFavorites(mergedFavs);
+                    showToast(`成功导入 ${importedFavs.length} 项收藏！\n(合并后共 ${mergedFavs.length} 项)`, `success`);
+                    setShowSyncModal(false);
+                    setSyncInputValue("");
+                } else {
+                    throw new Error("无效格式");
+                }
+            } catch (e) {
+                showToast("同步码格式不正确或已损坏！请确保复制完整。", "error");
+            }
+        }
+    };
+
+    const copyToClipboard = () => {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(syncInputValue).then(() => {
+                showToast("已复制到剪贴板！请发送给您的另一台设备。", "success");
+            });
+        } else {
+            showToast("当前环境不支持一键复制，请手动全选复制文本框内的代码。", "error");
+        }
     };
 
     return (
@@ -473,6 +528,22 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                         </button>
                                     )}
 
+                                    {/* 收藏同步按钮： */}
+                                    {(showFavoritesOnly) && (
+                                        <button 
+                                            onClick={() => {
+                                                setSyncInputMode(false);
+                                                setSyncInputValue("");
+                                                setShowSyncModal(true);
+                                            }}
+                                            className="flex items-center gap-1 px-3 py-1 bg-white border-2 border-[#fb7299]/30 text-wata-purple text-[11px] sm:text-xs font-bold rounded-full hover:bg-[#fb7299] hover:text-white hover:border-[#fb7299] transition-all cursor-pointer shadow-sm shrink-0"
+                                            title="在其他设备恢复或导出当前收藏"
+                                        >
+                                            <CloudSyncIcon />
+                                            <span>导入/导出</span>
+                                        </button>
+                                    )}
+
                                     {/* 取消 UP 主过滤按钮 */}
                                     {selectedUploader && (
                                         <button 
@@ -501,10 +572,22 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
                         {/* 空状态提示（当收藏夹为空时显示） */}
                         {showFavoritesOnly && currentData.length === 0 && (
-                            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                            <div className="flex flex-col items-center justify-center py-20 text-gray-400 fade-in-active">
                                 <HeartOutlineIcon className="w-16 h-16 mb-4 opacity-50" />
                                 <p className="font-bold text-lg">小站没有找到收藏作品喔</p>
-                                <p className="text-sm mt-2">点击心形图标即可收藏</p>
+                                <p className="text-sm mt-2 mb-6">点击心形图标即可收藏</p>
+                                
+                                {/* 👇 这里是新增的大按钮 */}
+                                <button 
+                                    onClick={() => {
+                                        setSyncInputMode(true);
+                                        setSyncInputValue("");
+                                        setShowSyncModal(true);
+                                    }}
+                                    className="flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-wata-lightPink text-wata-purple font-black rounded-full hover:bg-wata-pink hover:text-white hover:scale-105 hover:border-wata-pink hover:shadow-wata-hover transition-all shadow-sm cursor-pointer"
+                                >
+                                    <CloudSyncIcon /> 从其他设备导入收藏
+                                </button>
                             </div>
                         )}
 
@@ -639,7 +722,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     <div className="modal-enter relative bg-white rounded-[24px] sm:rounded-3xl shadow-2xl w-full max-w-lg p-6 sm:p-8 flex flex-col border-4 border-wata-lightPink">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl sm:text-2xl font-black title-font text-wata-dark">导入数据</h2>
-                            <button onClick={() => setShowUploadModal(false)} className="text-gray-300 hover:text-wata-pink hover:rotate-90 bg-gray-50 hover:bg-wata-lightPink p-1.5 sm:p-2 rounded-full transition-all">
+                            <button onClick={() => setShowUploadModal(false)} className="text-gray-300 hover:text-wata-pink hover:rotate-90 bg-gray-50 hover:bg-wata-lightPink p-1.5 sm:p-2 rounded-full transition-all cursor-pointer">
                                 <CloseIcon />
                             </button>
                         </div>
@@ -789,6 +872,71 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                 );
             })()}
 
+            {showSyncModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+                    <div className="absolute inset-0 bg-wata-dark/40 backdrop-blur-sm transition-opacity" onClick={() => setShowSyncModal(false)}></div>
+                    <div className="modal-enter relative bg-white rounded-[24px] sm:rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8 flex flex-col border-4 border-wata-lightPink">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl sm:text-2xl font-black title-font text-wata-dark flex items-center gap-2">
+                                {syncInputMode ? '导入收藏（BETA）' : '导出收藏（BETA）'}
+                            </h2>
+                            <button onClick={() => setShowSyncModal(false)} className="text-gray-300 hover:text-wata-pink hover:rotate-90 bg-gray-50 hover:bg-wata-lightPink p-1.5 sm:p-2 rounded-full transition-all cursor-pointer">
+                                <CloseIcon />
+                            </button>
+                        </div>
+                        
+                        <div className="flex bg-gray-100 p-1 rounded-full mb-6">
+                            <button type="button" onClick={() => { setSyncInputMode(false); setSyncInputValue(""); }} className={`flex-1 py-2 text-sm font-bold rounded-full transition-all cursor-pointer ${!syncInputMode ? 'bg-white shadow-sm text-wata-purple' : 'text-gray-500 hover:text-gray-700'}`}>导出分享</button>
+                            <button type="button" onClick={() => { setSyncInputMode(true); setSyncInputValue(""); }} className={`flex-1 py-2 text-sm font-bold rounded-full transition-all cursor-pointer ${syncInputMode ? 'bg-white shadow-sm text-wata-purple' : 'text-gray-500 hover:text-gray-700'}`}>导入恢复</button>
+                        </div>
+
+                        {!syncInputMode ? (
+                            <div className="space-y-4">
+                                <p className="text-sm font-medium text-gray-500">点击下方按钮生成您的收藏同步码，然后在其他设备上选择「导入恢复」并粘贴此代码即可同步。</p>
+                                {syncInputValue ? (
+                                    <div className="relative">
+                                        <textarea readOnly value={syncInputValue} className="w-full h-32 p-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs text-gray-600 focus:outline-none font-mono resize-none" />
+                                        <button onClick={copyToClipboard} className="absolute bottom-3 right-3 flex items-center gap-1.5 px-4 py-2 bg-wata-purple text-white text-xs font-bold rounded-lg hover:bg-opacity-90 transition-all shadow-sm cursor-pointer">
+                                            <CopyIcon /> 复制同步码
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button onClick={handleSyncAction} className="w-full py-4 bg-wata-lightPink/50 border-2 border-dashed border-wata-pink text-wata-pink font-bold rounded-xl hover:bg-wata-lightPink transition-all cursor-pointer">
+                                        生成当前收藏库的同步码
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <p className="text-sm font-medium text-gray-500">请在下方粘贴您从其他设备复制的同步代码。导入不会删除现有收藏，而是<strong className="text-wata-purple">自动合并</strong>。</p>
+                                <textarea 
+                                    placeholder="在此粘贴同步码" 
+                                    value={syncInputValue}
+                                    onChange={(e) => setSyncInputValue(e.target.value)}
+                                    className="w-full h-32 p-3 bg-white border-2 border-wata-lightPink focus:border-wata-pink rounded-xl text-xs text-gray-600 focus:outline-none focus:shadow-wata font-mono resize-none transition-all" 
+                                />
+                                <button onClick={handleSyncAction} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-[#fb7299] to-[#ff85a8] text-white font-black rounded-full hover:shadow-wata-hover hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                                    确认合并导入
+                                </button>
+                            </div>
+                        )}
+                        <p className="text-xs font-medium text-gray-400 mt-2">※ 该功能处于测试阶段，不确保功能稳定性，请谨慎使用。</p>
+                    </div>
+                </div>
+            )}
+
+            {/* 全局轻提示UI */}
+            <div className={`fixed top-10 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-300 ${toast.show ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10 pointer-events-none'}`}>
+                <div className={`px-6 py-3 rounded-full shadow-lg font-bold text-sm text-white flex items-center gap-2 ${toast.type === 'success' ? 'bg-gradient-to-r from-wata-cyan to-blue-400' : 'bg-gradient-to-r from-wata-pink to-[#ff85a8]'}`}>
+                    {toast.type === 'success' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    )}
+                    <span>{toast.msg}</span>
+                </div>
+            </div>
+
             {showAnnouncement && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
                     <div className="absolute inset-0 bg-wata-dark/40 backdrop-blur-sm transition-opacity" onClick={closeAnnouncement}></div>
@@ -804,6 +952,10 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             <ul className="space-y-2 pl-2 max-h-full overflow-y-auto">
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
+                                    <span>新增<b>导入和导出收藏列表</b>的测试功能，可以通过点击收藏页面中的“导入/导出”按钮即可使用；</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
                                     <span>添加了切换主页视频展示顺序的功能，通过点击“快速探索”中的排序按钮即可切换三种排序方式；</span>
                                 </li>
                                 <li className="flex items-start gap-2">
@@ -811,7 +963,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                     <span>主页默认“随机排序”，用户可选择切换为“表格倒序”（方便查看新收录作品）和“表格正序”（查看旧收录老作品）。</span>
                                 </li>
                             </ul>
-                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/04/16</p>
+                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/04/17</p>
                         </div>
                         <button onClick={closeAnnouncement} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-wata-pink to-wata-purple text-white font-black rounded-full hover:shadow-wata-hover hover:scale-105 transition-all duration-300 cursor-pointer">
                             我知道啦
