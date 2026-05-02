@@ -54,6 +54,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
     // 收藏功能的状态
     const [favorites, setFavorites] = useState([]);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [isFavLoading, setIsFavLoading] = useState(false);
 
     // 视图模式状态 (gallery 或者是 uploaders)
     const [viewMode, setViewMode] = useState('gallery'); 
@@ -235,9 +236,12 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
         if (showFavoritesOnly) {
             const reversedFavs = [...favorites].reverse();
             
-            validData = reversedFavs.map(favKey => {
-                return validData.find(item => getItemUniqueKey(item) === favKey);
-            }).filter(Boolean); // filter(Boolean) 是为了安全过滤掉原表格里可能已经被删除的失效收藏
+            const validDataMap = new Map();
+            validData.forEach(item => {
+                validDataMap.set(getItemUniqueKey(item), item);
+            });
+            
+            validData = reversedFavs.map(favKey => validDataMap.get(favKey)).filter(Boolean);
         }
 
         // 第三层：独立处理点击进来的 UP主 过滤
@@ -401,7 +405,15 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
                         {/* 我的收藏按钮 */}
                         <button 
-                            onClick={() => { setShowFavoritesOnly(!showFavoritesOnly); setViewMode('gallery'); setPage(1); }}
+                            onClick={() => {
+                                setIsFavLoading(true);
+                                setTimeout(() => {
+                                    setShowFavoritesOnly(!showFavoritesOnly); 
+                                    setViewMode('gallery'); 
+                                    setPage(1);
+                                    setIsFavLoading(false);
+                                }, 50);
+                            }}
                             className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-300 cursor-pointer ${showFavoritesOnly ? 'bg-wata-pink text-white shadow-wata' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                             title={showFavoritesOnly ? "查看全部" : "查看我的收藏"}
                         >
@@ -485,230 +497,242 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     </div>
                 ) : (
                     <div className="fade-in-active">
-                        {(data.length > 0 || selectedUploader) && (
-                            <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center">
-                                <span className="text-xs sm:text-sm font-black text-wata-purple mr-1 shrink-0">快速探索:</span>
-                                
-                                {/* UP 主列表按钮  */}
-                                <button 
-                                    onClick={() => { setViewMode('uploaders'); setPage(1); }}
-                                    className="flex items-center gap-1 px-3 py-1 bg-wata-purple text-white text-[11px] sm:text-xs font-bold rounded-full hover:shadow-wata hover:scale-105 transition-all cursor-pointer shrink-0"
-                                    title="查看UP主列表"
-                                >
-                                    <UsersIcon /> UP主列表
-                                </button>
-
-                                {customTags.map((tag, idx) => (
-                                    <button 
-                                        key={idx}
-                                        onClick={() => {setSearchTerm(tag); setPage(1); setShowFavoritesOnly(false);}} // 点击标签时退出纯收藏模式
-                                        className="px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-dark text-[11px] sm:text-xs font-normal rounded-full hover:bg-wata-pink hover:text-white hover:border-wata-pink hover:shadow-wata transition-all cursor-pointer shrink-0"
-                                    >
-                                        #{tag}
-                                    </button>
-                                ))}
-                                
-                                <div className="ml-auto flex flex-wrap justify-end gap-2">
-                                    {/* 排序切换按钮 (只在没有查看收藏夹时显示)  */}
-                                    {!showFavoritesOnly && (
+                         {isFavLoading ? (
+                            <div className="flex flex-col items-center justify-center py-32 text-wata-pink fade-in-active">
+                                <svg className="animate-spin h-12 w-12 mb-4 text-wata-pink" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p className="font-bold text-lg text-wata-dark">少女祈祷中...</p>
+                            </div>
+                        ) : (
+                            <>   
+                                {(data.length > 0 || selectedUploader) && (
+                                    <div className="flex flex-wrap gap-2 mb-6 sm:mb-8 items-center">
+                                        <span className="text-xs sm:text-sm font-black text-wata-purple mr-1 shrink-0">快速探索:</span>
+                                        
+                                        {/* UP 主列表按钮  */}
                                         <button 
-                                            onClick={() => {
-                                                if (sortMode === 'random') setSortMode('newest');
-                                                else if (sortMode === 'newest') setSortMode('oldest');
-                                                else setSortMode('random');
-                                                setPage(1);
-                                            }}
-                                            className="flex items-center gap-1 px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-purple text-[11px] sm:text-xs font-bold rounded-full hover:bg-wata-pink hover:text-white hover:border-wata-pink transition-all cursor-pointer shadow-sm shrink-0"
-                                            title="点击切换排序方式"
+                                            onClick={() => { setViewMode('uploaders'); setPage(1); }}
+                                            className="flex items-center gap-1 px-3 py-1 bg-wata-purple text-white text-[11px] sm:text-xs font-bold rounded-full hover:shadow-wata hover:scale-105 transition-all cursor-pointer shrink-0"
+                                            title="查看UP主列表"
                                         >
-                                            <SortIcon />
-                                            <span>
-                                                {sortMode === 'random' ? '打乱随机' : sortMode === 'newest' ? '表格倒序' : '表格正序'}
-                                            </span>
+                                            <UsersIcon /> UP主列表
                                         </button>
-                                    )}
 
-                                    {/* 收藏同步按钮： */}
-                                    {(showFavoritesOnly) && (
+                                        {customTags.map((tag, idx) => (
+                                            <button 
+                                                key={idx}
+                                                onClick={() => {setSearchTerm(tag); setPage(1); setShowFavoritesOnly(false);}} // 点击标签时退出纯收藏模式
+                                                className="px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-dark text-[11px] sm:text-xs font-normal rounded-full hover:bg-wata-pink hover:text-white hover:border-wata-pink hover:shadow-wata transition-all cursor-pointer shrink-0"
+                                            >
+                                                #{tag}
+                                            </button>
+                                        ))}
+                                        
+                                        <div className="ml-auto flex flex-wrap justify-end gap-2">
+                                            {/* 排序切换按钮 (只在没有查看收藏夹时显示)  */}
+                                            {!showFavoritesOnly && (
+                                                <button 
+                                                    onClick={() => {
+                                                        if (sortMode === 'random') setSortMode('newest');
+                                                        else if (sortMode === 'newest') setSortMode('oldest');
+                                                        else setSortMode('random');
+                                                        setPage(1);
+                                                    }}
+                                                    className="flex items-center gap-1 px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-purple text-[11px] sm:text-xs font-bold rounded-full hover:bg-wata-pink hover:text-white hover:border-wata-pink transition-all cursor-pointer shadow-sm shrink-0"
+                                                    title="点击切换排序方式"
+                                                >
+                                                    <SortIcon />
+                                                    <span>
+                                                        {sortMode === 'random' ? '打乱随机' : sortMode === 'newest' ? '表格倒序' : '表格正序'}
+                                                    </span>
+                                                </button>
+                                            )}
+
+                                            {/* 收藏同步按钮： */}
+                                            {(showFavoritesOnly) && (
+                                                <button 
+                                                    onClick={() => {
+                                                        setSyncInputMode(false);
+                                                        setSyncInputValue("");
+                                                        setShowSyncModal(true);
+                                                    }}
+                                                    className="flex items-center gap-1 px-3 py-1 bg-white border-2 border-wata-lightPink text-wata-purple text-[11px] sm:text-xs font-bold rounded-full hover:bg-[#fb7299] hover:text-white hover:border-[#fb7299] transition-all cursor-pointer shadow-sm shrink-0"
+                                                    title="在其他设备恢复或导出当前收藏"
+                                                >
+                                                    <CloudSyncIcon />
+                                                    <span>导入/导出</span>
+                                                </button>
+                                            )}
+
+                                            {/* 取消 UP 主过滤按钮 */}
+                                            {selectedUploader && (
+                                                <button 
+                                                    onClick={() => {setSelectedUploader(null); setPage(1);}}
+                                                    className="flex items-center px-3 py-1 bg-wata-pink text-white text-[11px] sm:text-xs font-bold rounded-full hover:bg-opacity-80 transition-all cursor-pointer shrink-0"
+                                                    title={`取消 UP主: ${selectedUploader}`}
+                                                >
+                                                    <span className="shrink-0">取消 UP主: </span>
+                                                    <span className="truncate max-w-[60px] sm:max-w-[150px] mx-1">{selectedUploader}</span>
+                                                    <span className="shrink-0"> x</span>
+                                                </button>
+                                            )}
+
+                                            {/* 清除检索按钮 */}
+                                            {searchTerm && (
+                                                <button 
+                                                    onClick={() => {setSearchTerm(""); setPage(1);}}
+                                                    className="flex items-center px-3 py-1 bg-gray-100 text-gray-500 text-[11px] sm:text-xs font-bold rounded-full hover:bg-gray-200 transition-all cursor-pointer shrink-0"
+                                                >
+                                                    清除检索 x
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 空状态提示（当收藏夹为空时显示） */}
+                                {showFavoritesOnly && currentData.length === 0 && (
+                                    <div className="flex flex-col items-center justify-center py-20 text-gray-400 fade-in-active">
+                                        <HeartOutlineIcon className="w-16 h-16 mb-4 opacity-50" />
+                                        <p className="font-bold text-lg">小站没有找到收藏作品喔</p>
+                                        <p className="text-sm mt-2 mb-6">点击心形图标即可收藏</p>
+                                        
+                                        {/* 👇 这里是新增的大按钮 */}
                                         <button 
                                             onClick={() => {
-                                                setSyncInputMode(false);
+                                                setSyncInputMode(true);
                                                 setSyncInputValue("");
                                                 setShowSyncModal(true);
                                             }}
-                                            className="flex items-center gap-1 px-3 py-1 bg-white border-2 border-[#fb7299]/30 text-wata-purple text-[11px] sm:text-xs font-bold rounded-full hover:bg-[#fb7299] hover:text-white hover:border-[#fb7299] transition-all cursor-pointer shadow-sm shrink-0"
-                                            title="在其他设备恢复或导出当前收藏"
+                                            className="flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-wata-lightPink text-wata-purple font-black rounded-full hover:bg-wata-pink hover:text-white hover:scale-105 hover:border-wata-pink hover:shadow-wata-hover transition-all shadow-sm cursor-pointer"
                                         >
-                                            <CloudSyncIcon />
-                                            <span>导入/导出</span>
+                                            <CloudSyncIcon /> 从其他设备导入收藏
                                         </button>
-                                    )}
-
-                                    {/* 取消 UP 主过滤按钮 */}
-                                    {selectedUploader && (
-                                        <button 
-                                            onClick={() => {setSelectedUploader(null); setPage(1);}}
-                                            className="flex items-center px-3 py-1 bg-wata-pink text-white text-[11px] sm:text-xs font-bold rounded-full hover:bg-opacity-80 transition-all cursor-pointer shrink-0"
-                                            title={`取消 UP主: ${selectedUploader}`}
-                                        >
-                                            <span className="shrink-0">取消 UP主: </span>
-                                            <span className="truncate max-w-[60px] sm:max-w-[150px] mx-1">{selectedUploader}</span>
-                                            <span className="shrink-0"> x</span>
-                                        </button>
-                                    )}
-
-                                    {/* 清除检索按钮 */}
-                                    {searchTerm && (
-                                        <button 
-                                            onClick={() => {setSearchTerm(""); setPage(1);}}
-                                            className="flex items-center px-3 py-1 bg-gray-100 text-gray-500 text-[11px] sm:text-xs font-bold rounded-full hover:bg-gray-200 transition-all cursor-pointer shrink-0"
-                                        >
-                                            清除检索 x
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 空状态提示（当收藏夹为空时显示） */}
-                        {showFavoritesOnly && currentData.length === 0 && (
-                            <div className="flex flex-col items-center justify-center py-20 text-gray-400 fade-in-active">
-                                <HeartOutlineIcon className="w-16 h-16 mb-4 opacity-50" />
-                                <p className="font-bold text-lg">小站没有找到收藏作品喔</p>
-                                <p className="text-sm mt-2 mb-6">点击心形图标即可收藏</p>
-                                
-                                {/* 👇 这里是新增的大按钮 */}
-                                <button 
-                                    onClick={() => {
-                                        setSyncInputMode(true);
-                                        setSyncInputValue("");
-                                        setShowSyncModal(true);
-                                    }}
-                                    className="flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-wata-lightPink text-wata-purple font-black rounded-full hover:bg-wata-pink hover:text-white hover:scale-105 hover:border-wata-pink hover:shadow-wata-hover transition-all shadow-sm cursor-pointer"
-                                >
-                                    <CloudSyncIcon /> 从其他设备导入收藏
-                                </button>
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-6 sm:gap-x-5 sm:gap-y-8">
-                            {currentData.map((item, index) => {
-                                const originalTitle = getValue(item, ['原视频标题']) || '未知标题';
-                                const translatedName = getValue(item, ['翻译视频标题(黑字熟肉红字生肉)']);
-                                const displayTitle = (translatedName && translatedName !== '') ? translatedName : originalTitle;
-                                const author = getValue(item, ['原视频作者']) || '未知原作者';
-                                
-                                const rawUploader = getValue(item, ['译者昵称', '译者', 'UP主昵称', '转载up主', 'UP主', '上传']) || '未知译者';
-                                const uploader = rawUploader.replace(/(^|[^a-zA-Z])[(（\[{【\s]*uid[:：\s]*\d+[)）\]}】\s]*/gi, '$1').trim() || '未知译者';
-                                
-                                const publishDate = getValue(item, ['发布日期', '发布时间', '日期', '投稿时间', '投稿日期']);
-                                const coverGradient = getAvatarGradient(originalTitle + index);
-                                const avatarGradient = getAvatarGradient(uploader);
-                                const uploaderFirstLetter = uploader !== '未知译者' ? uploader.substring(0, 1).toUpperCase() : '?';
-
-                                const localCoverUrl = getValue(item, ['封面', '封面图', '封面链接', '海报']);
-                                const isFav = favorites.includes(getItemUniqueKey(item));
-
-                                return (
-                                    <div 
-                                        key={`card-${showFavoritesOnly}-${selectedUploader}-${sortMode}-${page}-${searchTerm}-${index}`}
-                                        className="video-card group cursor-pointer fade-in-active flex flex-col"
-                                        style={{
-                                            animationFillMode: 'both', 
-                                            animationDelay: `${(index % itemsPerPage) * 0.04}s` 
-                                        }}
-                                        onClick={() => setSelectedItem(item)}
-                                    >
-                                        <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-3 shadow-sm bg-gray-200">
-                                            
-                                            {localCoverUrl ? (
-                                                <img 
-                                                    src={localCoverUrl} 
-                                                    alt="视频封面" 
-                                                    loading="lazy" 
-                                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                    onError={(e) => { e.target.style.display = 'none'; }} 
-                                                />
-                                            ) : (
-                                                <div className={`video-cover absolute inset-0 bg-gradient-to-br ${coverGradient} opacity-80`}></div>
-                                            )}
-
-                                            {/* 卡片右上角的收藏按钮 */}
-                                            <button 
-                                                onClick={(e) => toggleFavorite(e, item)}
-                                                className="absolute top-2 right-2 z-20 p-2 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 cursor-pointer"
-                                                title={isFav ? "取消收藏" : "加入收藏"}
-                                            >
-                                                {isFav ? <HeartFilledIcon className="text-wata-pink" /> : <HeartOutlineIcon />}
-                                            </button>
-                                            
-                                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 pointer-events-none">
-                                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                                                    <PlayIcon />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="flex gap-2.5 sm:gap-3 px-1">
-                                            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full shrink-0 flex items-center justify-center text-white font-black text-xs sm:text-sm bg-gradient-to-br ${avatarGradient} shadow-sm border-2 border-white`}>
-                                                {uploaderFirstLetter}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="text-sm sm:text-[15px] font-bold text-wata-dark leading-tight line-clamp-2 mb-1.5 group-hover:text-wata-pink transition-colors" title={displayTitle}>
-                                                    {displayTitle}
-                                                </h3>
-                                                <div className="flex flex-col gap-1 text-[11px] sm:text-[12px] text-gray-500 font-semibold mt-1">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-1 hover:text-wata-purple truncate max-w-[65%]" title={`译者/UP主: ${uploader}`}>
-                                                            <UpIcon /> <span className="truncate leading-none pt-0.5">{uploader}</span>
-                                                        </div>
-                                                        {publishDate && (
-                                                            <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-gray-400 shrink-0" title={`发布日期: ${publishDate}`}>
-                                                                <DateIcon /> <span className="leading-none pt-0.5">{publishDate}</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-1 hover:text-wata-pink truncate" title={`原作者: ${author}`}>
-                                                        <AuthorIcon /> <span className="truncate leading-none pt-0.5">{author}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                );
-                            })}
-                        </div>
+                                )}
 
-                        {totalPages > 1 && (
-                            <div className="flex justify-center items-center mt-10 sm:mt-12 gap-2 sm:gap-3 pb-8">
-                                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="h-9 px-3 sm:h-10 sm:px-4 rounded-full bg-white border-2 border-wata-lightPink text-wata-purple font-black disabled:opacity-50 hover:bg-wata-pink hover:text-white hover:border-wata-pink text-xs sm:text-sm shadow-sm transition-all cursor-pointer">
-                                    上一页
-                                </button>
-                                
-                                <div 
-                                    className="h-9 px-3 sm:h-10 sm:px-5 rounded-full bg-gradient-to-r from-wata-pink to-wata-purple text-white font-black flex items-center shadow-wata text-xs sm:text-sm focus-within:ring-2 focus-within:ring-wata-pink/50 transition-all cursor-text" 
-                                    title="点击输入页码直接跳转"
-                                >
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max={totalPages}
-                                        value={inputPage}
-                                        onChange={(e) => setInputPage(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') e.target.blur();
-                                        }}
-                                        onBlur={handleJumpPage}
-                                        className="w-7 sm:w-9 bg-transparent text-center text-white outline-none placeholder:text-white/70 font-black focus:bg-white/20 rounded transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                    />
-                                    <span className="mx-0.5 sm:mx-1 opacity-80 font-bold">/</span>
-                                    <span className="opacity-80">{totalPages}</span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-6 sm:gap-x-5 sm:gap-y-8">
+                                    {currentData.map((item, index) => {
+                                        const originalTitle = getValue(item, ['原视频标题']) || '未知标题';
+                                        const translatedName = getValue(item, ['翻译视频标题(黑字熟肉红字生肉)']);
+                                        const displayTitle = (translatedName && translatedName !== '') ? translatedName : originalTitle;
+                                        const author = getValue(item, ['原视频作者']) || '未知原作者';
+                                        
+                                        const rawUploader = getValue(item, ['译者昵称', '译者', 'UP主昵称', '转载up主', 'UP主', '上传']) || '未知译者';
+                                        const uploader = rawUploader.replace(/(^|[^a-zA-Z])[(（\[{【\s]*uid[:：\s]*\d+[)）\]}】\s]*/gi, '$1').trim() || '未知译者';
+                                        
+                                        const publishDate = getValue(item, ['发布日期', '发布时间', '日期', '投稿时间', '投稿日期']);
+                                        const coverGradient = getAvatarGradient(originalTitle + index);
+                                        const avatarGradient = getAvatarGradient(uploader);
+                                        const uploaderFirstLetter = uploader !== '未知译者' ? uploader.substring(0, 1).toUpperCase() : '?';
+
+                                        const localCoverUrl = getValue(item, ['封面', '封面图', '封面链接', '海报']);
+                                        const isFav = favorites.includes(getItemUniqueKey(item));
+
+                                        return (
+                                            <div 
+                                                key={`card-${showFavoritesOnly}-${selectedUploader}-${sortMode}-${page}-${searchTerm}-${index}`}
+                                                className="video-card group cursor-pointer fade-in-active flex flex-col"
+                                                style={{
+                                                    animationFillMode: 'both', 
+                                                    animationDelay: `${(index % itemsPerPage) * 0.04}s` 
+                                                }}
+                                                onClick={() => setSelectedItem(item)}
+                                            >
+                                                <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-3 shadow-sm bg-gray-200">
+                                                    
+                                                    {localCoverUrl ? (
+                                                        <img 
+                                                            src={localCoverUrl} 
+                                                            alt="视频封面" 
+                                                            loading="lazy" 
+                                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                            onError={(e) => { e.target.style.display = 'none'; }} 
+                                                        />
+                                                    ) : (
+                                                        <div className={`video-cover absolute inset-0 bg-gradient-to-br ${coverGradient} opacity-80`}></div>
+                                                    )}
+
+                                                    {/* 卡片右上角的收藏按钮 */}
+                                                    <button 
+                                                        onClick={(e) => toggleFavorite(e, item)}
+                                                        className="absolute top-2 right-2 z-20 p-2 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 cursor-pointer"
+                                                        title={isFav ? "取消收藏" : "加入收藏"}
+                                                    >
+                                                        {isFav ? <HeartFilledIcon className="text-wata-pink" /> : <HeartOutlineIcon />}
+                                                    </button>
+                                                    
+                                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 pointer-events-none">
+                                                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                                                            <PlayIcon />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex gap-2.5 sm:gap-3 px-1">
+                                                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full shrink-0 flex items-center justify-center text-white font-black text-xs sm:text-sm bg-gradient-to-br ${avatarGradient} shadow-sm border-2 border-white`}>
+                                                        {uploaderFirstLetter}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-sm sm:text-[15px] font-bold text-wata-dark leading-tight line-clamp-2 mb-1.5 group-hover:text-wata-pink transition-colors" title={displayTitle}>
+                                                            {displayTitle}
+                                                        </h3>
+                                                        <div className="flex flex-col gap-1 text-[11px] sm:text-[12px] text-gray-500 font-semibold mt-1">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-1 hover:text-wata-purple truncate max-w-[65%]" title={`译者/UP主: ${uploader}`}>
+                                                                    <UpIcon /> <span className="truncate leading-none pt-0.5">{uploader}</span>
+                                                                </div>
+                                                                {publishDate && (
+                                                                    <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-gray-400 shrink-0" title={`发布日期: ${publishDate}`}>
+                                                                        <DateIcon /> <span className="leading-none pt-0.5">{publishDate}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex items-center gap-1 hover:text-wata-pink truncate" title={`原作者: ${author}`}>
+                                                                <AuthorIcon /> <span className="truncate leading-none pt-0.5">{author}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
-                                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="h-9 px-3 sm:h-10 sm:px-4 rounded-full bg-white border-2 border-wata-lightPink text-wata-purple font-black disabled:opacity-50 hover:bg-wata-pink hover:text-white hover:border-wata-pink text-xs sm:text-sm shadow-sm transition-all cursor-pointer">
-                                    下一页
-                                </button>
-                            </div>
+                                {totalPages > 1 && (
+                                    <div className="flex justify-center items-center mt-10 sm:mt-12 gap-2 sm:gap-3 pb-8">
+                                        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="h-9 px-3 sm:h-10 sm:px-4 rounded-full bg-white border-2 border-wata-lightPink text-wata-purple font-black disabled:opacity-50 hover:bg-wata-pink hover:text-white hover:border-wata-pink text-xs sm:text-sm shadow-sm transition-all cursor-pointer">
+                                            上一页
+                                        </button>
+                                        
+                                        <div 
+                                            className="h-9 px-3 sm:h-10 sm:px-5 rounded-full bg-gradient-to-r from-wata-pink to-wata-purple text-white font-black flex items-center shadow-wata text-xs sm:text-sm focus-within:ring-2 focus-within:ring-wata-pink/50 transition-all cursor-text" 
+                                            title="点击输入页码直接跳转"
+                                        >
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max={totalPages}
+                                                value={inputPage}
+                                                onChange={(e) => setInputPage(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') e.target.blur();
+                                                }}
+                                                onBlur={handleJumpPage}
+                                                className="w-7 sm:w-9 bg-transparent text-center text-white outline-none placeholder:text-white/70 font-black focus:bg-white/20 rounded transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            />
+                                            <span className="mx-0.5 sm:mx-1 opacity-80 font-bold">/</span>
+                                            <span className="opacity-80">{totalPages}</span>
+                                        </div>
+
+                                        <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="h-9 px-3 sm:h-10 sm:px-4 rounded-full bg-white border-2 border-wata-lightPink text-wata-purple font-black disabled:opacity-50 hover:bg-wata-pink hover:text-white hover:border-wata-pink text-xs sm:text-sm shadow-sm transition-all cursor-pointer">
+                                            下一页
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 )}
