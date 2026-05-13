@@ -943,8 +943,9 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         {!syncInputMode ? (
                             <div className="space-y-4">
                                 <p className="text-sm font-medium text-gray-500">点击下方按钮，将您的收藏库保存为本地 <strong className="text-wata-pink">.json</strong> 文件。您可以在其他设备上导入此文件来恢复收藏。</p>
-                                <button onClick={exportFavoritesToFile} className="w-full py-3 sm:py-3.5 bg-wata-purple text-white font-black rounded-full hover:shadow-wata-hover hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
-                                    下载收藏库备份文件 (.json)
+                                <button onClick={exportFavoritesToFile} className="flex items-center justify-center gap-1.5 w-full py-3 sm:py-3.5 bg-[#fb7299] text-white font-black rounded-full hover:shadow-wata-hover hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m8 17 4 4 4-4"></path></svg>
+                                    下载收藏库备份文件
                                 </button>
                             </div>
                         ) : (
