@@ -48,8 +48,9 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 收藏导入导出弹窗状态
     const [showSyncModal, setShowSyncModal] = useState(false);
-    const [syncInputMode, setSyncInputMode] = useState(false); // false: 导出模式, true: 导入模式
+    const [syncInputMode, setSyncInputMode] = useState(false);
     const [syncInputValue, setSyncInputValue] = useState("");
+    const [isDragging, setIsDragging] = useState(false);
     
     // 收藏功能的状态
     const [favorites, setFavorites] = useState([]);
@@ -314,43 +315,68 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
         return colors[Math.abs(hash) % colors.length];
     };
 
-    const handleSyncAction = () => {
-        if (!syncInputMode) {
-            try {
-                const jsonStr = JSON.stringify(favorites);
-                const b64Str = btoa(encodeURIComponent(jsonStr));
-                setSyncInputValue(b64Str);
-            } catch (e) {
-                showToast("生成同步码失败！", "error");
-            }
-        } else {
-            if (!syncInputValue.trim()) { showToast("请输入同步码！", "error"); return; }
-            try {
-                const jsonStr = decodeURIComponent(atob(syncInputValue.trim()));
-                const importedFavs = JSON.parse(jsonStr);
-                if (Array.isArray(importedFavs)) {
-                    const mergedFavs = Array.from(new Set([...favorites, ...importedFavs]));
-                    setFavorites(mergedFavs);
-                    showToast(`成功导入 ${importedFavs.length} 项收藏！\n(合并后共 ${mergedFavs.length} 项)`, `success`);
-                    setShowSyncModal(false);
-                    setSyncInputValue("");
-                } else {
-                    throw new Error("无效格式");
-                }
-            } catch (e) {
-                showToast("同步码格式不正确或已损坏！请确保复制完整。", "error");
-            }
+    // 将收藏导出为 JSON 文件
+    const exportFavoritesToFile = () => {
+        try {
+            const jsonStr = JSON.stringify(favorites);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "biliVManga_favorites.json"; // 导出的文件名
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("收藏库已成功导出为文件！", "success");
+        } catch (e) {
+            showToast("导出失败！", "error");
         }
     };
 
-    const copyToClipboard = () => {
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(syncInputValue).then(() => {
-                showToast("已复制到剪贴板！请发送给您的另一台设备。", "success");
-            });
-        } else {
-            showToast("当前环境不支持一键复制，请手动全选复制文本框内的代码。", "error");
-        }
+    // 从 JSON 文件导入并合并收藏
+    const processImportedFile = (file) => {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedFavs = JSON.parse(e.target.result);
+                if (Array.isArray(importedFavs)) {
+                    const mergedFavs = Array.from(new Set([...favorites, ...importedFavs]));
+                    setFavorites(mergedFavs);
+                    showToast(`成功导入 ${importedFavs.length} 项收藏！(合并后共 ${mergedFavs.length} 项)`, "success");
+                    setShowSyncModal(false);
+                } else {
+                    throw new Error("无效格式");
+                }
+            } catch (err) {
+                showToast("文件格式不正确或已损坏！请确保选择了正确的备份文件。", "error");
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    // 按钮点击选择文件导入
+    const importFavoritesFromFile = (event) => {
+        processImportedFile(event.target.files[0]);
+        event.target.value = ''; 
+    };
+
+    // 3个拖拽事件处理函数
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        processImportedFile(e.dataTransfer.files[0]);
     };
 
     return (
@@ -910,38 +936,40 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         </div>
                         
                         <div className="flex bg-gray-100 p-1 rounded-full mb-6">
-                            <button type="button" onClick={() => { setSyncInputMode(false); setSyncInputValue(""); }} className={`flex-1 py-2 text-sm font-bold rounded-full transition-all cursor-pointer ${!syncInputMode ? 'bg-white shadow-sm text-wata-purple' : 'text-gray-500 hover:text-gray-700'}`}>导出分享</button>
-                            <button type="button" onClick={() => { setSyncInputMode(true); setSyncInputValue(""); }} className={`flex-1 py-2 text-sm font-bold rounded-full transition-all cursor-pointer ${syncInputMode ? 'bg-white shadow-sm text-wata-purple' : 'text-gray-500 hover:text-gray-700'}`}>导入恢复</button>
+                            <button type="button" onClick={() => setSyncInputMode(false)} className={`flex-1 py-2 text-sm font-bold rounded-full transition-all cursor-pointer ${!syncInputMode ? 'bg-white shadow-sm text-wata-purple' : 'text-gray-500 hover:text-gray-700'}`}>导出分享</button>
+                            <button type="button" onClick={() => setSyncInputMode(true)} className={`flex-1 py-2 text-sm font-bold rounded-full transition-all cursor-pointer ${syncInputMode ? 'bg-white shadow-sm text-wata-purple' : 'text-gray-500 hover:text-gray-700'}`}>导入恢复</button>
                         </div>
 
                         {!syncInputMode ? (
                             <div className="space-y-4">
-                                <p className="text-sm font-medium text-gray-500">点击下方按钮生成您的收藏同步码，然后在其他设备上选择「导入恢复」并粘贴此代码即可同步。</p>
-                                {syncInputValue ? (
-                                    <div className="relative">
-                                        <textarea readOnly value={syncInputValue} className="w-full h-32 p-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-xs text-gray-600 focus:outline-none font-mono resize-none" />
-                                        <button onClick={copyToClipboard} className="absolute bottom-3 right-3 flex items-center gap-1.5 px-4 py-2 bg-wata-purple text-white text-xs font-bold rounded-lg hover:bg-opacity-90 transition-all shadow-sm cursor-pointer">
-                                            <CopyIcon /> 复制同步码
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button onClick={handleSyncAction} className="w-full py-4 bg-wata-lightPink/50 border-2 border-dashed border-wata-pink text-wata-pink font-bold rounded-xl hover:bg-wata-lightPink transition-all cursor-pointer">
-                                        生成当前收藏库的同步码
-                                    </button>
-                                )}
+                                <p className="text-sm font-medium text-gray-500">点击下方按钮，将您的收藏库保存为本地 <strong className="text-wata-pink">.json</strong> 文件。您可以在其他设备上导入此文件来恢复收藏。</p>
+                                <button onClick={exportFavoritesToFile} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-[#fb7299] to-[#ff85a8] text-white font-black rounded-full hover:shadow-wata-hover hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
+                                    下载收藏库备份文件 (.json)
+                                </button>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                <p className="text-sm font-medium text-gray-500">请在下方粘贴您从其他设备复制的同步代码。导入不会删除现有收藏，而是<strong className="text-wata-purple">自动合并</strong>。</p>
-                                <textarea 
-                                    placeholder="在此粘贴同步码" 
-                                    value={syncInputValue}
-                                    onChange={(e) => setSyncInputValue(e.target.value)}
-                                    className="w-full h-32 p-3 bg-white border-2 border-wata-lightPink focus:border-wata-pink rounded-xl text-xs text-gray-600 focus:outline-none focus:shadow-wata font-mono resize-none transition-all" 
-                                />
-                                <button onClick={handleSyncAction} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-[#fb7299] to-[#ff85a8] text-white font-black rounded-full hover:shadow-wata-hover hover:-translate-y-0.5 transition-all duration-300 cursor-pointer">
-                                    确认合并导入
-                                </button>
+                                <p className="text-sm font-medium text-gray-500">请选择您之前导出的 <strong className="text-wata-pink">.json</strong> 备份文件。导入不会删除现有收藏，而是<strong className="text-wata-pink">自动合并</strong>。</p>
+                                
+                                <label 
+                                    onDragOver={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={handleDrop}
+                                    className={`w-full border-2 border-dashed rounded-2xl p-8 sm:p-10 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group ${isDragging ? 'border-wata-pink bg-wata-lightPink/40 scale-[1.02]' : 'border-wata-lightPink hover:border-wata-pink bg-wata-bg/30 hover:bg-wata-lightPink/20'}`}
+                                >
+                                    <div className={`transition-transform duration-300 mb-4 ${isDragging ? 'text-wata-pink scale-110' : 'text-wata-purple group-hover:text-wata-pink group-hover:scale-110'}`}>
+                                        <FileUploadBigIcon />
+                                    </div>
+                                    <span className={`text-sm sm:text-base font-black transition-colors ${isDragging ? 'text-wata-pink' : 'text-wata-dark group-hover:text-wata-pink'}`}>
+                                        {isDragging ? '松开鼠标立刻导入' : '点击或拖拽 JSON 文件导入收藏'}
+                                    </span>
+                                    <input 
+                                        type="file" 
+                                        accept=".json" 
+                                        onChange={importFavoritesFromFile} 
+                                        className="hidden" 
+                                    />
+                                </label>
                             </div>
                         )}
                         <p className="text-xs font-medium text-gray-400 mt-2">※ 该功能处于测试阶段，不确保功能稳定性，请谨慎使用。</p>
@@ -976,18 +1004,10 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             <ul className="space-y-2 pl-2 max-h-full overflow-y-auto">
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>新增<b>导入和导出收藏列表</b>的测试功能，可以通过点击收藏页面中的“导入/导出”按钮即可使用；</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>添加了切换主页视频展示顺序的功能，通过点击“快速探索”中的排序按钮即可切换三种排序方式；</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>主页默认“随机排序”，用户可选择切换为“表格倒序”（方便查看新收录作品）和“表格正序”（查看旧收录老作品）。</span>
+                                    <span>我们将“导入/导出”功能从分享码更改为导出、导入“.json”收藏数据文件，以解决在收藏视频过多时分享码太长导致无法方便保存与导入收藏列表的问题。</span>
                                 </li>
                             </ul>
-                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/04/17</p>
+                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/05/13</p>
                         </div>
                         <button onClick={closeAnnouncement} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-wata-pink to-wata-purple text-white font-black rounded-full hover:shadow-wata-hover hover:scale-105 transition-all duration-300 cursor-pointer">
                             我知道啦
