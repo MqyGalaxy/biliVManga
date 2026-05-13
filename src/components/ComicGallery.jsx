@@ -70,7 +70,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (1)
     useEffect(() => {
-        const hasSeen = localStorage.getItem('announcement_2026v3');
+        const hasSeen = localStorage.getItem('announcement_2026v4');
         if (!hasSeen) {
             setShowAnnouncement(true);
         }
@@ -95,7 +95,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (2)
     const closeAnnouncement = () => {
-        localStorage.setItem('announcement_2026v3', 'true');
+        localStorage.setItem('announcement_2026v4', 'true');
         setShowAnnouncement(false);
     };
 
