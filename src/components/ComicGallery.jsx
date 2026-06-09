@@ -405,7 +405,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                         </div>
                     </a>
 
-                    <div className="hidden md:flex flex-1 max-w-md mx-4">
+                    <div className="hidden lg:flex flex-1 max-w-md mx-4">
                         <div className="relative w-full group">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-wata-purple group-focus-within:text-wata-pink">
                                 <SearchIcon />
@@ -444,7 +444,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             title={showFavoritesOnly ? "查看全部" : "查看我的收藏"}
                         >
                             {showFavoritesOnly ? <HeartFilledIcon className="text-white" /> : <HeartOutlineIcon />}
-                            <span className="hidden sm:inline-block">{showFavoritesOnly ? '查看全部' : '我的收藏'}</span>
+                            <span className="hidden md:inline-block">{showFavoritesOnly ? '查看全部' : '我的收藏'}</span>
                         </button>
 
                         <button 
@@ -453,19 +453,19 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full font-black text-xs sm:text-sm transition-all duration-300 shadow-wata hover:shadow-wata-hover hover:scale-105 cursor-pointer ${loading ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-wata-pink to-wata-purple text-white'}`}
                         >
                             <UploadIcon />
-                            <span className="hidden sm:inline-block">{loading ? '解析中..' : '导入表格'}</span>
+                            <span className="hidden md:inline-block">{loading ? '解析中..' : '导入表格'}</span>
                         </button>
                     </div>
                 </div>
 
-                <div className="md:hidden px-4 pb-3">
+                <div className="lg:hidden px-4 pb-3">
                     <div className="relative w-full group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-wata-purple">
                             <SearchIcon />
                         </div>
                         <input 
                             type="text" 
-                            placeholder="搜索译名..." 
+                            placeholder="搜索译名、标题、作者..." 
                             className="w-full py-2.5 pl-11 pr-4 bg-wata-bg border-2 border-wata-lightPink rounded-full text-sm font-bold focus:outline-none focus:bg-white focus:border-wata-pink shadow-sm transition-all"
                             value={searchTerm}
                             onChange={(e) => {
