@@ -70,7 +70,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (1)
     useEffect(() => {
-        const hasSeen = localStorage.getItem('announcement_2026v4');
+        const hasSeen = localStorage.getItem('announcement_2026v5');
         if (!hasSeen) {
             setShowAnnouncement(true);
         }
@@ -95,7 +95,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (2)
     const closeAnnouncement = () => {
-        localStorage.setItem('announcement_2026v4', 'true');
+        localStorage.setItem('announcement_2026v5', 'true');
         setShowAnnouncement(false);
     };
 
@@ -826,14 +826,23 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
             {selectedItem && (() => {
                 const translatedName = getValue(selectedItem, ['译名', '中文名', '译文标题', '翻译', '中文']);
                 const originalTitle = getValue(selectedItem, ['原视频标题', '视频标题', '日文标题', '原标题']);
+                const originalAuthor = getValue(selectedItem, ['原视频作者', '原作者', '作者']);
+                const rawOrigLink = getValue(selectedItem, ['原视频链接', '原本链接', '原链接', '油管', 'youtube', 'twitter', '推特', '源链接']);
+                const detailCoverUrl = getValue(selectedItem, ['封面', '封面图', '封面链接', '海报']);
                 const modalMainTitle = (translatedName && translatedName !== '') ? translatedName : (originalTitle || '详情信息');
                 
                 let biliLink = getValue(selectedItem, ['翻译视频链接', 'bilibili', 'b站', '哔哩', '转载链接', 'bilibili链接']);
-                let origLink = getValue(selectedItem, ['原视频链接', '原本链接', '原链接', '油管', 'youtube', 'twitter', '推特', '源链接']);
+                let origLink = rawOrigLink;
                 
                 if (origLink && (origLink.includes('bilibili.com') || origLink.includes('b23.tv'))) { if (!biliLink) { biliLink = origLink; origLink = ''; } }
                 if (biliLink && (biliLink.includes('youtube.com') || biliLink.includes('twitter.com'))) { if (!origLink) { origLink = biliLink; biliLink = ''; } }
                 if (biliLink && origLink && biliLink === origLink) origLink = '';
+
+                const originalInfoRows = [
+                    { label: '原视频标题', value: originalTitle },
+                    { label: '原视频链接', value: rawOrigLink || origLink, isLink: true },
+                    { label: '原视频作者', value: originalAuthor },
+                ].filter(row => row.value);
 
                 // 判断弹窗中的项是否已收藏
                 const isItemFav = favorites.includes(getItemUniqueKey(selectedItem));
@@ -842,7 +851,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6">
                         <div className="absolute inset-0 bg-wata-dark/40 backdrop-blur-sm" onClick={() => setSelectedItem(null)}></div>
                         
-                        <div className="modal-enter relative bg-white rounded-[24px] sm:rounded-3xl shadow-2xl w-full max-w-3xl max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden border-4 border-wata-lightPink">
+                        <div className="modal-enter relative bg-white rounded-[24px] sm:rounded-3xl shadow-2xl w-full max-w-4xl max-h-[92vh] sm:max-h-[90vh] flex flex-col overflow-hidden border-4 border-wata-lightPink">
                             <div className="h-2 sm:h-4 bg-gradient-to-r from-wata-pink via-wata-purple to-wata-cyan w-full shrink-0"></div>
                             
                             {/* --- 顶部只保留关闭按钮 --- */}
@@ -858,6 +867,41 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             </div>
                             
                             <div className="px-4 py-4 sm:px-6 sm:py-6 overflow-y-auto flex-grow bg-wata-bg/30">
+                                {(originalInfoRows.length > 0 || detailCoverUrl) && (
+                                    <div className="mb-4 sm:mb-5 rounded-2xl bg-white/90 p-3 sm:p-4 shadow-sm border-2 border-transparent hover:border-wata-lightPink transition-colors">
+                                        <div className="flex flex-col md:flex-row gap-4 md:gap-5 md:items-start">
+                                        {detailCoverUrl && (
+                                            <figure className="order-1 md:order-2 md:w-[38%] lg:w-[34%] shrink-0 flex items-center justify-center">
+                                                <img
+                                                    src={detailCoverUrl}
+                                                    alt="视频封面"
+                                                    loading="lazy"
+                                                    className="block w-full h-auto max-h-64 object-contain rounded-xl shadow-sm"
+                                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                                />
+                                            </figure>
+                                        )}
+
+                                        {originalInfoRows.length > 0 && (
+                                            <dl className="order-2 md:order-1 flex-1 min-w-0 divide-y divide-wata-lightPink/60">
+                                                {originalInfoRows.map((row) => (
+                                                    <div key={row.label} className="py-2.5 first:pt-0 last:pb-0 sm:grid sm:grid-cols-[6.5rem_minmax(0,1fr)] sm:gap-4 sm:items-start">
+                                                        <dt className="text-[10px] sm:text-xs font-black text-wata-purple uppercase tracking-wider leading-5">{row.label}</dt>
+                                                        <dd className="text-xs sm:text-sm font-black text-wata-dark break-all whitespace-pre-wrap leading-relaxed">
+                                                            {row.isLink ? (
+                                                                <a href={row.value} target="_blank" rel="noopener noreferrer" className="text-wata-pink hover:text-[#ff85a8] hover:underline select-all">{row.value}</a>
+                                                            ) : (
+                                                                <span className="select-text">{row.value}</span>
+                                                            )}
+                                                        </dd>
+                                                    </div>
+                                                ))}
+                                            </dl>
+                                        )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                                     {tableHeaders.map((key) => {
                                         const value = selectedItem[key];
@@ -867,6 +911,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                                         
                                         const lowerKey = key.toLowerCase();
                                         if (['翻译视频标题(黑字熟肉红字生肉)', '封面'].some(k => lowerKey.includes(k))) return null;
+                                        if (['原视频标题', '视频标题', '日文标题', '原标题', '原视频链接', '原本链接', '原链接', '油管', 'youtube', 'twitter', '推特', '源链接', '原视频作者', '原作者'].some(k => lowerKey.includes(k.toLowerCase()))) return null;
                                         if (value.trim() === modalMainTitle) return null;
                                         if (lowerKey.includes('序号')) return null;
 
@@ -1005,10 +1050,10 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             <ul className="space-y-2 pl-2 max-h-full overflow-y-auto">
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>我们将“导入/导出”功能从分享码更改为导出、导入“.json”收藏数据文件，以解决在收藏视频过多时分享码太长导致无法方便保存与导入收藏列表的问题。</span>
+                                    <span>我们修改了视频详情页面的排版和布局。现在详情页面也能预览视频封面，并且优化了原视频信息的展示布局将其更紧凑地展现在视频封面旁。</span>
                                 </li>
                             </ul>
-                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/05/13</p>
+                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/07/02</p>
                         </div>
                         <button onClick={closeAnnouncement} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-wata-pink to-wata-purple text-white font-black rounded-full hover:shadow-wata-hover hover:scale-105 transition-all duration-300 cursor-pointer">
                             我知道啦
