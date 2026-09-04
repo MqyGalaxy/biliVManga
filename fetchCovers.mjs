@@ -13,19 +13,89 @@ if (!fs.existsSync(COVERS_DIR)) {
 }
 
 // 伪装浏览器请求头防止 B 站 API 拦截
+const BILIBILI_COOKIE = process.env.BILIBILI_COOKIE?.trim() || '';
+
 const HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Referer': 'https://www.bilibili.com'
+    'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+        'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+        'Chrome/152.0.0.0 Safari/537.36',
+
+    'Referer': 'https://www.bilibili.com/',
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+
+    ...(BILIBILI_COOKIE
+        ? { 'Cookie': BILIBILI_COOKIE }
+        : {})
 };
+
+let bilibiliBlocked = false;
 
 async function downloadCover(bvid) {
     try {
         // 1. 请求 B 站 API 获取视频信息
-        const apiRes = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`, { headers: HEADERS });
-        const data = await apiRes.json();
+        const apiRes = await fetch(
+            `https://api.bilibili.com/x/web-interface/view?bvid=${encodeURIComponent(bvid)}`,
+            {
+                headers: HEADERS,
+                redirect: 'follow'
+            }
+        );
 
-        if (data.code !== 0 || !data.data.pic) {
-            console.log(`❌ [${bvid}] 获取封面地址失败，可能视频已失效`);
+        const contentType = apiRes.headers.get('content-type') || '';
+        const rawText = await apiRes.text();
+
+        console.log(`🌐 [${bvid}] API Status: ${apiRes.status}`);
+        console.log(`🌐 [${bvid}] Content-Type: ${contentType}`);
+
+        // 尝试解析 JSON，但不直接调用 apiRes.json()
+        let data = null;
+
+        if (contentType.includes('application/json')) {
+            try {
+                data = JSON.parse(rawText);
+            } catch {
+                console.log(`⚠️ [${bvid}] JSON 解析失败`);
+            }
+        }
+
+        // B站 412 风控
+        if (
+            apiRes.status === 412 ||
+            data?.code === -412
+        ) {
+            console.log(`🚫 [${bvid}] B站触发 412 风控: request was banned`);
+            console.log(`🚫 停止继续请求，避免风控进一步加重`);
+
+            bilibiliBlocked = true;
+            return null;
+        }
+
+        // HTTP 层错误
+        if (!apiRes.ok) {
+            console.log(`⚠️ [${bvid}] API HTTP 错误: ${apiRes.status}`);
+            console.log(rawText.slice(0, 300));
+            return null;
+        }
+
+        // 返回的不是 JSON
+        if (!data) {
+            console.log(`⚠️ [${bvid}] B站返回的不是有效 JSON`);
+            console.log(rawText.slice(0, 300));
+            return null;
+        }
+
+        // B站 API 自身返回错误
+        if (data.code !== 0) {
+            console.log(
+                `❌ [${bvid}] B站 API 错误: code=${data.code}, message=${data.message}`
+            );
+            return null;
+        }
+
+        if (!data.data?.pic) {
+            console.log(`❌ [${bvid}] 没有获取到封面地址，可能视频已失效`);
             return null;
         }
 
@@ -118,23 +188,57 @@ async function main() {
                     if (match) {
                         const bvid = match[1];
                         
-                        // 断点续传检查
-                        const expectedLocalPath = path.join(COVERS_DIR, `${bvid}.webp`);
+                        // 断点续传 / 已下载封面检查
+                        const expectedLocalPath = path.join(
+                            COVERS_DIR,
+                            `${bvid}.webp`
+                        );
+
+                        // ① 本地已经存在：无论有没有触发 412，都直接实装
                         if (fs.existsSync(expectedLocalPath)) {
-                            console.log(`⏩ [${bvid}] 本地已存在，自动跳过`);
-                            row[coverIndex] = `/covers/${bvid}.webp`; // 依然补全表格路径
+                            console.log(`✅ [${bvid}] 本地已有封面，实装到 CSV`);
+
+                            row[coverIndex] = `/covers/${bvid}.webp`;
+
                             continue;
                         }
 
-                        // 执行下载
+                        // ② 已经触发过 412：禁止继续请求 B站
+                        // 本地又没有封面，所以什么都不修改
+                        if (bilibiliBlocked) {
+                            console.log(
+                                `⏭️ [${bvid}] 412 风控中，本地无封面，保持原样`
+                            );
+
+                            continue;
+                        }
+
+                        // ③ 尚未触发 412，正常尝试下载
                         const localPath = await downloadCover(bvid);
+
                         if (localPath) {
-                            row[coverIndex] = localPath; 
+                            row[coverIndex] = localPath;
                             downloadCount++;
                         }
-                        
-                        // 每次下载完停顿 0.5 秒
-                        await delay(500); 
+
+                        // 如果刚刚这个请求触发了 412
+                        // 不 break，后面继续扫描 CSV
+                        if (bilibiliBlocked) {
+                            console.log('\n🛑 Bilibili API 已触发 412');
+                            console.log('📦 停止联网下载，但继续扫描已有本地封面\n');
+
+                            continue;
+                        }
+
+                        // 随机等待 2~4 秒
+                        const waitTime =
+                            2000 + Math.floor(Math.random() * 2000);
+
+                        console.log(
+                            `⏳ 等待 ${(waitTime / 1000).toFixed(1)} 秒...`
+                        );
+
+                        await delay(waitTime);
                     }
                 }
             }

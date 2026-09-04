@@ -70,7 +70,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (1)
     useEffect(() => {
-        const hasSeen = localStorage.getItem('announcement_2026v5');
+        const hasSeen = localStorage.getItem('announcement_2026v6');
         if (!hasSeen) {
             setShowAnnouncement(true);
         }
@@ -95,7 +95,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
 
     // 修改公告版本号 (2)
     const closeAnnouncement = () => {
-        localStorage.setItem('announcement_2026v5', 'true');
+        localStorage.setItem('announcement_2026v6', 'true');
         setShowAnnouncement(false);
     };
 
@@ -1040,7 +1040,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                     <div className="absolute inset-0 bg-wata-dark/40 backdrop-blur-sm transition-opacity" onClick={closeAnnouncement}></div>
                     <div className="modal-enter relative bg-white rounded-[24px] sm:rounded-3xl shadow-2xl w-full max-w-md max-h-[85vh] p-6 sm:p-8 flex flex-col border-4 border-wata-lightPink">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl sm:text-2xl font-black text-wata-dark">更新公告</h2>
+                            <h2 className="text-xl sm:text-2xl font-black text-wata-dark">通知</h2>
                             <button onClick={closeAnnouncement} className="text-gray-300 hover:text-wata-pink hover:rotate-90 bg-gray-50 hover:bg-wata-lightPink p-1.5 sm:p-2 rounded-full transition-all cursor-pointer">
                                 <CloseIcon />
                             </button>
@@ -1050,10 +1050,18 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             <ul className="space-y-2 pl-2 max-h-full overflow-y-auto">
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>我们修改了视频详情页面的排版和布局。现在详情页面也能预览视频封面，并且优化了原视频信息的展示布局将其更紧凑地展现在视频封面旁。</span>
+                                    <span>由于用于抓封面更新的脚本被b站风控412暂时无法工作，脚本现已更新完毕，但站长被ban需要一段时间回复。</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
+                                    <span>小站可以继续更新同步表格数据，但2026/08/20之后的视频将暂时不会同步封面。</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
+                                    <span>为您带来不便敬请谅解。</span>
                                 </li>
                             </ul>
-                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/07/02</p>
+                            <p className="pt-2 text-xs text-gray-400"><br />更新日期：2026/09/04</p>
                         </div>
                         <button onClick={closeAnnouncement} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-wata-pink to-wata-purple text-white font-black rounded-full hover:shadow-wata-hover hover:scale-105 transition-all duration-300 cursor-pointer">
                             我知道啦
