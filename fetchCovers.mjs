@@ -194,7 +194,7 @@ async function main() {
                             `${bvid}.webp`
                         );
 
-                        // ① 本地已经存在：无论有没有触发 412，都直接实装
+                        // 本地已经存在：无论有没有触发 412，都直接实装
                         if (fs.existsSync(expectedLocalPath)) {
                             console.log(`✅ [${bvid}] 本地已有封面，实装到 CSV`);
 
@@ -203,7 +203,7 @@ async function main() {
                             continue;
                         }
 
-                        // ② 已经触发过 412：禁止继续请求 B站
+                        // 已经触发过 412：禁止继续请求 B站
                         // 本地又没有封面，所以什么都不修改
                         if (bilibiliBlocked) {
                             console.log(

@@ -1,3 +1,7 @@
+>[!IMPORTANT]
+>由于用于抓封面更新的脚本被b站风控412暂时无法工作，脚本现已更新完毕，但站长被ban需要一段时间恢复。
+>小站可以继续更新同步表格数据，但2026/08/20之后的视频将暂时不会同步封面。
+>为您带来不便敬请谅解。
 
 <center><img src="src/assets/logo.png" style="width: 300px; hegiht: auto;"></center>
 <center><b>有声漫画汉化视频索引</b></center>

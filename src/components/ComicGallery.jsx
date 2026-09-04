@@ -1050,7 +1050,7 @@ export default function ComicGallery({ initialData = [], initialHeaders = [] }) 
                             <ul className="space-y-2 pl-2 max-h-full overflow-y-auto">
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
-                                    <span>由于用于抓封面更新的脚本被b站风控412暂时无法工作，脚本现已更新完毕，但站长被ban需要一段时间回复。</span>
+                                    <span>由于用于抓封面更新的脚本被b站风控412暂时无法工作，脚本现已更新完毕，但站长被ban需要一段时间恢复。</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-wata-pink mt-1.5 shrink-0"></span>
