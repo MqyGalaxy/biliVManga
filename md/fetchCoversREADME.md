@@ -31,7 +31,7 @@ message = request was banned
 ```powershell
 $env:BILIBILI_COOKIE = (Get-Clipboard).Trim()
 $env:BILIBILI_COOKIE.Length
-node .\fetchCovers_checked.mjs
+node fetchCovers.mjs
 ```
 
 运行结束后清除：
