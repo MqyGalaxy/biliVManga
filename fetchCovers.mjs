@@ -6,6 +6,7 @@ import Papa from 'papaparse';
 const INPUT_CSV = './src/data/comics.csv';             // 你原始表格的路径
 const OUTPUT_CSV = './src/data/comics_with_cover.csv'; // 生成的新表格路径
 const COVERS_DIR = './public/covers';                  // 下载图片存放的 Astro public 目录
+const SKIP_BVIDS_FILE = './src/data/bilibili_skip_bvids.json'; // 保存无法访问的BV号视频数据
 
 // 确保封面目录存在
 if (!fs.existsSync(COVERS_DIR)) {
@@ -31,6 +32,44 @@ const HEADERS = {
 };
 
 let bilibiliBlocked = false;
+
+// 读取bv号跳过名单
+function loadSkipBvids() {
+    try {
+        if (!fs.existsSync(SKIP_BVIDS_FILE)) {
+            return new Set();
+        }
+
+        const raw = fs.readFileSync(SKIP_BVIDS_FILE, 'utf8').trim();
+
+        if (!raw) {
+            return new Set();
+        }
+
+        const parsed = JSON.parse(raw);
+
+        if (!Array.isArray(parsed)) {
+            console.warn(`⚠️ 跳过名单文件格式不正确，已忽略: ${SKIP_BVIDS_FILE}`);
+            return new Set();
+        }
+
+        return new Set(parsed.filter(v => typeof v === 'string'));
+    } catch (error) {
+        console.warn(`⚠️ 读取跳过名单失败: ${error.message}`);
+        return new Set();
+    }
+}
+
+function saveSkipBvids(skipBvids) {
+    try {
+        const arr = Array.from(skipBvids).sort();
+        fs.writeFileSync(SKIP_BVIDS_FILE, JSON.stringify(arr, null, 2), 'utf8');
+    } catch (error) {
+        console.warn(`⚠️ 保存跳过名单失败: ${error.message}`);
+    }
+}
+
+const skipBvids = loadSkipBvids();
 
 async function downloadCover(bvid) {
     try {
@@ -66,7 +105,7 @@ async function downloadCover(bvid) {
             data?.code === -412
         ) {
             console.log(`🚫 [${bvid}] B站触发 412 风控: request was banned`);
-            console.log(`🚫 停止继续请求，避免风控进一步加重`);
+            console.log(`📦 停止后续联网请求，但继续扫描并实装已有本地封面`);
 
             bilibiliBlocked = true;
             return null;
@@ -88,9 +127,22 @@ async function downloadCover(bvid) {
 
         // B站 API 自身返回错误
         if (data.code !== 0) {
-            console.log(
-                `❌ [${bvid}] B站 API 错误: code=${data.code}, message=${data.message}`
-            );
+            if ([62012, 62002, -404].includes(data.code)) {
+                console.log(
+                    `⏭️ [${bvid}] 命中可跳过错误 code=${data.code}，加入跳过名单，以后不再查询`
+                );
+
+                skipBvids.add(bvid);
+                saveSkipBvids(skipBvids);
+
+            } else if (data.code === 62004) {
+                console.log(`⏳ [${bvid}] 视频正在审核中，暂时跳过并保持原样`);
+            } else {
+                console.log(
+                    `❌ [${bvid}] B站 API 错误: code=${data.code}, message=${data.message}`
+                );
+            }
+
             return null;
         }
 
@@ -104,7 +156,19 @@ async function downloadCover(bvid) {
         
         // 3. 下载图片
         const imgRes = await fetch(picUrl, { headers: HEADERS });
-        if (!imgRes.ok) throw new Error(`图片下载失败: ${imgRes.status}`);
+
+        // 图片 CDN 也可能触发 412
+        if (imgRes.status === 412) {
+            console.log(`🚫 [${bvid}] 封面图片请求触发 412 风控`);
+            console.log(`📦 停止后续联网请求，但继续扫描已有本地封面`);
+
+            bilibiliBlocked = true;
+            return null;
+        }
+
+        if (!imgRes.ok) {
+            throw new Error(`图片下载失败: ${imgRes.status}`);
+        }
 
         // 4. 兼容性极强的 Buffer 写入方式
         const arrayBuffer = await imgRes.arrayBuffer();
@@ -130,6 +194,13 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 async function main() {
     console.log('🚀 开始智能解析 CSV 并下载封面...');
+    console.log(`📋 已加载 ${skipBvids.size} 个永久跳过 BV 记录`);
+
+    if (!BILIBILI_COOKIE) {
+        console.warn(
+            '⚠️ 未检测到 BILIBILI_COOKIE，B站 API 可能返回 412 风控。'
+        );
+    }
     
     if (!fs.existsSync(INPUT_CSV)) {
         console.error(`❌ 找不到输入文件: ${INPUT_CSV}`);
@@ -199,6 +270,16 @@ async function main() {
                             console.log(`✅ [${bvid}] 本地已有封面，实装到 CSV`);
 
                             row[coverIndex] = `/covers/${bvid}.webp`;
+
+                            continue;
+                        }
+
+                        // 已经记录为永久跳过的视频，不再请求 B站 API
+                        // 如果本地没有封面，则保持 CSV 原样
+                        if (skipBvids.has(bvid)) {
+                            console.log(
+                                `⏭️ [${bvid}] 已在永久跳过名单中，不再查询 API，保持原样`
+                            );
 
                             continue;
                         }
